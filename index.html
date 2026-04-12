@@ -391,16 +391,11 @@
   </div>
 </div>
 
-<!-- Firebase -->
-<script type="module">
-  import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup,
-           onAuthStateChanged, signOut }
-                                  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, increment,
-           collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp }
-                                  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+<!-- Firebase compat SDK — works on GitHub Pages, no popup issues -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey:"AIzaSyChv74n2mnd5EQTceDFJOmkZJtHklIGXHY",
     authDomain:"translator-app-707a1.firebaseapp.com",
@@ -410,25 +405,40 @@
     appId:"1:526317377351:web:ec536c09210f928f045e62"
   };
 
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
   let currentUser = null;
 
-  // ── Auth state ────────────────────────────────────
-  onAuthStateChanged(auth, async user => {
+  const GOOGLE_SVG = `<svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google`;
+
+  // ── Handle redirect result on page load ──────────────
+  auth.getRedirectResult().then(result => {
+    if (result && result.user) {
+      // User returned from Google redirect — handled by onAuthStateChanged
+      console.log('Redirect sign-in success:', result.user.email);
+    }
+  }).catch(err => {
+    console.error('Redirect result error:', err.message);
+    const errEl = document.getElementById('loginErr');
+    if (errEl) { errEl.textContent = 'Sign-in failed: ' + err.message; errEl.classList.add('v'); }
+  });
+
+  // ── Auth state listener ───────────────────────────────
+  auth.onAuthStateChanged(async user => {
     if (user) {
       currentUser = user;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appScreen').style.display   = 'block';
       document.getElementById('userEmail').textContent     = user.email;
       // Register user in Firestore (idempotent)
-      const uRef = doc(db, 'users', user.uid);
-      const snap = await getDoc(uRef);
-      if (!snap.exists()) {
-        await setDoc(uRef, { email: user.email, createdAt: serverTimestamp(), translations: 0 });
-      }
+      try {
+        const uRef = db.collection('users').doc(user.uid);
+        const snap = await uRef.get();
+        if (!snap.exists) {
+          await uRef.set({ email: user.email, createdAt: firebase.firestore.FieldValue.serverTimestamp(), translations: 0 });
+        }
+      } catch(e) { console.warn('Firestore user register failed:', e.message); }
     } else {
       currentUser = null;
       document.getElementById('loginScreen').style.display = 'flex';
@@ -436,69 +446,67 @@
     }
   });
 
-  // ── Auth actions ──────────────────────────────────
-  window.signInWithGoogle = async () => {
+  // ── Sign in with Google via REDIRECT (works everywhere) ──
+  window.signInWithGoogle = () => {
     const btn   = document.getElementById('googleBtn');
     const errEl = document.getElementById('loginErr');
     errEl.classList.remove('v');
     btn.disabled = true;
-    btn.innerHTML = '<span style="font-size:14px;">⏳ Signing in…</span>';
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch(err) {
-      let msg = 'Sign-in failed. Please try again.';
-      if (err.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled. Please try again.';
-      if (err.code === 'auth/popup-blocked') msg = 'Popup was blocked. Please allow popups for this page.';
-      errEl.textContent = msg; errEl.classList.add('v');
+    btn.innerHTML = '⏳ Redirecting to Google…';
+    const provider = new firebase.auth.GoogleAuthProvider();
+    // Use redirect — works on GitHub Pages, mobile, all browsers
+    auth.signInWithRedirect(provider).catch(err => {
+      errEl.textContent = 'Sign-in failed: ' + err.message;
+      errEl.classList.add('v');
       btn.disabled = false;
-      btn.innerHTML = \`<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>Sign in with Google\`;
-    }
+      btn.innerHTML = GOOGLE_SVG;
+    });
   };
 
-  window.doLogout = () => signOut(auth);
+  window.doLogout = () => {
+    auth.signOut();
+  };
 
-  // ── Analytics: log a translation ─────────────────
+  // ── Analytics: log a translation (compat syntax) ────
   window.logTranslation = async (sourceUrl, titleKn) => {
     if (!currentUser) return;
-    const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    const today = new Date().toISOString().slice(0,10);
     try {
-      // 1. Add to translations collection
-      await addDoc(collection(db, 'translations'), {
+      await db.collection('translations').add({
         uid: currentUser.uid,
         email: currentUser.email,
         url: sourceUrl || '(pasted text)',
         titleKn: titleKn || '',
         date: today,
-        createdAt: serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      // 2. Increment global counter
-      const globalRef = doc(db, 'stats', 'global');
-      const snap = await getDoc(globalRef);
-      if (snap.exists()) {
-        await updateDoc(globalRef, { total: increment(1), [`daily.${today}`]: increment(1) });
+      const globalRef = db.collection('stats').doc('global');
+      const snap = await globalRef.get();
+      if (snap.exists) {
+        await globalRef.update({
+          total: firebase.firestore.FieldValue.increment(1),
+          [`daily.${today}`]: firebase.firestore.FieldValue.increment(1)
+        });
       } else {
-        await setDoc(globalRef, { total: 1, daily: { [today]: 1 } });
+        await globalRef.set({ total: 1, daily: { [today]: 1 } });
       }
-      // 3. Increment user counter
-      await updateDoc(doc(db, 'users', currentUser.uid), { translations: increment(1) });
-    } catch(e) { console.warn('Analytics log failed:', e); }
+      await db.collection('users').doc(currentUser.uid).update({
+        translations: firebase.firestore.FieldValue.increment(1)
+      });
+    } catch(e) { console.warn('Analytics log failed:', e.message); }
   };
 
-  // ── Dashboard ─────────────────────────────────────
+  // ── Dashboard (compat syntax) ─────────────────────
   window.openDashboard = async () => {
     document.getElementById('dashModal').classList.add('v');
     document.getElementById('statTotal').textContent = '…';
     document.getElementById('statToday').textContent = '…';
     document.getElementById('statUsers').textContent = '…';
     document.getElementById('recentList').innerHTML = '<div class="dash-loading">⏳ Loading…</div>';
-
     try {
       const today = new Date().toISOString().slice(0,10);
-
-      // Global stats
-      const globalSnap = await getDoc(doc(db, 'stats', 'global'));
-      if (globalSnap.exists()) {
+      const globalSnap = await db.collection('stats').doc('global').get();
+      if (globalSnap.exists) {
         const d = globalSnap.data();
         document.getElementById('statTotal').textContent = (d.total || 0).toLocaleString();
         document.getElementById('statToday').textContent = ((d.daily && d.daily[today]) || 0).toLocaleString();
@@ -506,14 +514,9 @@
         document.getElementById('statTotal').textContent = '0';
         document.getElementById('statToday').textContent = '0';
       }
-
-      // User count
-      const usersSnap = await getDocs(collection(db, 'users'));
+      const usersSnap = await db.collection('users').get();
       document.getElementById('statUsers').textContent = usersSnap.size.toLocaleString();
-
-      // Recent translations
-      const q = query(collection(db, 'translations'), orderBy('createdAt','desc'), limit(10));
-      const tSnap = await getDocs(q);
+      const tSnap = await db.collection('translations').orderBy('createdAt','desc').limit(10).get();
       const recentEl = document.getElementById('recentList');
       if (tSnap.empty) {
         recentEl.innerHTML = '<div class="dash-empty">No translations yet. Start translating!</div>';
@@ -521,23 +524,22 @@
         recentEl.innerHTML = '';
         tSnap.forEach(docSnap => {
           const d = docSnap.data();
-          const ts = d.createdAt?.toDate ? d.createdAt.toDate() : new Date();
+          const ts = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date();
           const timeStr = ts.toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
           const item = document.createElement('div');
           item.className = 'recent-item';
-          item.innerHTML = `
-            <div style="overflow:hidden;">
-              <div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px;">${d.titleKn || 'Untitled'}</div>
-              <div class="ri-url">${d.url}</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;">👤 ${d.email}</div>
-            </div>
-            <div class="ri-time">${timeStr}</div>`;
+          item.innerHTML =
+            '<div style="overflow:hidden;">' +
+            '<div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px;">' + (d.titleKn || 'Untitled') + '</div>' +
+            '<div class="ri-url">' + (d.url || '') + '</div>' +
+            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">👤 ' + (d.email || '') + '</div>' +
+            '</div><div class="ri-time">' + timeStr + '</div>';
           recentEl.appendChild(item);
         });
       }
     } catch(e) {
-      document.getElementById('recentList').innerHTML = '<div class="dash-empty">Could not load data. Check Firestore rules.</div>';
-      console.warn('Dashboard error:', e);
+      document.getElementById('recentList').innerHTML = '<div class="dash-empty">Could not load data.</div>';
+      console.warn('Dashboard error:', e.message);
     }
   };
 
