@@ -1,836 +1,1154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kannada Translator — TrendingVerse</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Kannada:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    :root{
-      --ink:#1a0a00;--paper:#fdf6ee;--saffron:#d4640a;
-      --deep:#8b2500;--gold:#c49a2f;--muted:#7a6455;
-      --rule:#e2cdb8;--card:#fff9f2;--glow:rgba(212,100,10,0.12);
-      --tv:#e85d04;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden;}
-    body::before{content:'';position:fixed;inset:0;
-      background:radial-gradient(ellipse 80% 50% at 10% 20%,rgba(212,100,10,.07) 0%,transparent 60%),
-                 radial-gradient(ellipse 60% 60% at 90% 80%,rgba(139,37,0,.05) 0%,transparent 60%);
-      pointer-events:none;z-index:0;}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rewrite Engine — Journalistic Article Rewriter</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f1eb;
+    --paper-dark: #ece7de;
+    --rule: #c8bfb0;
+    --accent: #b5401a;
+    --accent-dim: #d4622f;
+    --muted: #6b6356;
+    --success: #2a6b3c;
+    --panel: #faf7f2;
+    --shadow: 0 2px 12px rgba(15,14,12,0.10);
+    --shadow-lg: 0 8px 40px rgba(15,14,12,0.15);
+    --radius: 4px;
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --display: 'Playfair Display', Georgia, serif;
+  }
 
-    /* ── POWERED BY BAR ──────────────────────── */
-    .tv-topbar{
-      background:linear-gradient(90deg,var(--deep),var(--saffron));
-      text-align:center;padding:7px 16px;
-      font-size:12px;color:rgba(255,255,255,.9);
-      letter-spacing:.05em;position:relative;z-index:10;
-    }
-    .tv-topbar a{color:#fff;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.5);}
-    .tv-topbar a:hover{border-bottom-color:#fff;}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── LOGIN ───────────────────────────────── */
-    #loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 34px);position:relative;z-index:1;padding:20px;}
-    .login-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:44px 40px;width:100%;max-width:430px;box-shadow:0 8px 40px rgba(0,0,0,.09);position:relative;overflow:hidden;}
-    .login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--saffron),var(--deep));}
-    .login-brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;}
-    .login-brand-logo{font-family:'Noto Sans Kannada',sans-serif;font-size:36px;font-weight:700;color:var(--saffron);line-height:1;}
-    .login-brand-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);line-height:1.2;}
-    .login-brand-name span{display:block;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
-    .login-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:5px;}
-    .login-sub{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin-bottom:26px;}
-    .google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;border:1.5px solid #dadce0;border-radius:8px;padding:13px 20px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#3c4043;cursor:pointer;transition:box-shadow .2s,border-color .2s;margin-bottom:4px;}
-    .google-btn:hover{box-shadow:0 2px 12px rgba(0,0,0,.12);border-color:#c6c6c6;}
-    .google-btn:disabled{opacity:.6;cursor:not-allowed;}
-    .google-btn svg{flex-shrink:0;}
-    .login-err{display:none;margin-top:14px;padding:10px 14px;background:rgba(180,30,30,.07);border:1px solid rgba(180,30,30,.25);border-radius:6px;color:#8b1a1a;font-size:13px;line-height:1.5;text-align:center;}
-    .login-err.v{display:block;}
-    .login-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:12px;}
-    .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--rule);}
-    .login-footer{margin-top:18px;text-align:center;font-size:11px;color:var(--muted);}
-    .login-footer a{color:var(--saffron);text-decoration:none;font-weight:500;}
-    .login-footer a:hover{text-decoration:underline;}
+  body {
+    font-family: var(--serif);
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
 
-    /* ── APP SHELL ───────────────────────────── */
-    #appScreen{display:none;}
+  /* Newspaper texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='none'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23b0a898' opacity='0.25'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .masthead{border-bottom:3px double var(--rule);padding:14px 36px 12px;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
-    .masthead-brand{display:flex;align-items:center;gap:12px;}
-    .masthead-logo{font-family:'Noto Sans Kannada',sans-serif;font-size:30px;font-weight:700;color:var(--saffron);line-height:1;}
-    .masthead-info{}
-    .masthead-kn{font-family:'Noto Sans Kannada',sans-serif;font-size:11px;color:var(--saffron);margin-bottom:1px;}
-    .masthead-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;}
-    .masthead-title span{color:var(--saffron);}
-    .masthead-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.1em;text-transform:uppercase;}
-    .masthead-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-    .user-pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--rule);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--muted);}
-    .user-pill .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;}
-    .dash-btn{font-size:12px;color:#fff;background:linear-gradient(135deg,var(--saffron),var(--deep));border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:500;transition:opacity .2s;}
-    .dash-btn:hover{opacity:.85;}
-    .logout-btn{font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--rule);border-radius:4px;padding:5px 12px;cursor:pointer;transition:all .2s;}
-    .logout-btn:hover{color:var(--deep);border-color:var(--deep);}
+  /* ── MASTHEAD ─────────────────────────────────────────── */
+  header {
+    position: relative;
+    z-index: 1;
+    border-bottom: 3px double var(--ink);
+    padding: 24px 40px 18px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
 
-    .rule-ornament{text-align:center;font-size:13px;color:var(--gold);opacity:.5;padding:4px 0;border-bottom:1px solid var(--rule);letter-spacing:10px;}
+  .masthead-left { display: flex; flex-direction: column; gap: 4px; }
 
-    /* ── DASHBOARD MODAL ─────────────────────── */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:20px;}
-    .modal-overlay.v{display:flex;}
-    .modal{background:var(--card);border:1px solid var(--rule);border-radius:10px;width:100%;max-width:680px;box-shadow:0 20px 60px rgba(0,0,0,.15);overflow:hidden;animation:fadeUp .3s ease;}
-    .modal-header{background:linear-gradient(135deg,var(--saffron),var(--deep));padding:18px 26px;display:flex;align-items:center;justify-content:space-between;}
-    .modal-header h2{font-family:'Playfair Display',serif;font-size:20px;color:#fff;font-weight:700;}
-    .modal-header p{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;letter-spacing:.08em;text-transform:uppercase;}
-    .modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
-    .modal-close:hover{background:rgba(255,255,255,.35);}
-    .modal-body{padding:28px 26px;}
+  .edition-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
 
-    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
-    .stat-card{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:18px 16px;text-align:center;position:relative;overflow:hidden;}
-    .stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
-    .stat-card.total::before{background:linear-gradient(90deg,var(--saffron),var(--deep));}
-    .stat-card.today::before{background:linear-gradient(90deg,#22c55e,#16a34a);}
-    .stat-card.users::before{background:linear-gradient(90deg,#6366f1,#4f46e5);}
-    .stat-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px;}
-    .stat-card.today .stat-num{color:#16a34a;}
-    .stat-card.users .stat-num{color:#4f46e5;}
-    .stat-label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+  }
 
-    .recent-list{border:1px solid var(--rule);border-radius:6px;overflow:hidden;}
-    .recent-list h3{font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--saffron);padding:12px 16px;background:rgba(212,100,10,.05);border-bottom:1px solid var(--rule);}
-    .recent-item{padding:11px 16px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink);}
-    .recent-item:last-child{border-bottom:none;}
-    .recent-item .ri-url{color:var(--muted);font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px;}
-    .recent-item .ri-time{font-size:11px;color:var(--muted);white-space:nowrap;margin-left:10px;}
-    .dash-empty{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
-    .dash-loading{text-align:center;padding:30px;color:var(--saffron);}
+  h1 span {
+    color: var(--accent);
+    font-style: italic;
+    font-weight: 400;
+  }
 
-    /* ── MAIN CONTAINER ──────────────────────── */
-    .container{max-width:860px;margin:0 auto;padding:24px 24px 60px;position:relative;z-index:1;}
-    .section-label{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--saffron);margin-bottom:10px;}
+  .tagline {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
 
-    .free-note{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #86efac;border-radius:6px;padding:12px 18px;margin-bottom:18px;font-size:13px;color:#166534;line-height:1.5;}
-    .free-note .icon{font-size:22px;flex-shrink:0;}
+  .api-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
 
-    /* ── INPUT MODE TOGGLE ───────────────────── */
-    .mode-tabs{display:flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin-bottom:18px;}
-    .mode-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;background:var(--paper);color:var(--muted);border:none;transition:all .2s;}
-    .mode-tab.active{background:linear-gradient(135deg,var(--saffron),var(--deep));color:#fff;}
+  .api-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-    .input-panel{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:22px 24px;margin-bottom:20px;box-shadow:0 2px 14px rgba(0,0,0,.04);position:relative;}
-    .input-panel::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--saffron),var(--deep));border-radius:4px 0 0 4px;}
+  .api-input {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 12px;
+    border: 1.5px solid var(--rule);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: var(--radius);
+    width: 220px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .api-input:focus { border-color: var(--accent); }
+  .api-input::placeholder { color: var(--rule); }
 
-    .input-group{display:flex;gap:10px;align-items:stretch;}
-    .url-input{flex:1;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:11px 15px;outline:none;transition:border-color .2s,box-shadow .2s;}
-    .url-input::placeholder{color:var(--muted);opacity:.7;}
-    .url-input:focus{border-color:var(--saffron);box-shadow:0 0 0 3px var(--glow);}
-    .paste-area{width:100%;min-height:130px;resize:vertical;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:12px 15px;outline:none;line-height:1.65;transition:border-color .2s;}
-    .paste-area:focus{border-color:var(--saffron);box-shadow:0 0 0 3px var(--glow);}
-    .translate-btn{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,var(--saffron),var(--deep));border:none;border-radius:3px;padding:11px 22px;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .15s;}
-    .translate-btn:hover{opacity:.9;transform:translateY(-1px);}
-    .translate-btn:active{transform:translateY(0);}
-    .translate-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
-    .translate-btn .sp{display:none;}
-    .translate-btn.loading .bt{display:none;}
-    .translate-btn.loading .sp{display:inline;}
+  .api-save-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .api-save-btn:hover { background: var(--accent); }
 
-    .options-row{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;align-items:center;}
-    .opt{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
-    .opt input[type=checkbox]{accent-color:var(--saffron);}
+  #api-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    display: none;
+  }
+  #api-status.saved { display: inline-block; background: #e6f2eb; color: var(--success); }
+  #api-status.error { display: inline-block; background: #fbe9e4; color: var(--accent); }
 
-    /* ── PROGRESS & STATUS ───────────────────── */
-    .progress-bar-wrap{display:none;margin-bottom:16px;}
-    .progress-bar-wrap.v{display:block;}
-    .progress-label{font-size:12px;color:var(--saffron);margin-bottom:6px;display:flex;justify-content:space-between;}
-    .progress-track{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--deep));width:0%;transition:width .3s ease;border-radius:3px;}
-    .status-bar{display:none;align-items:center;gap:12px;padding:12px 18px;background:rgba(212,100,10,.07);border:1px solid rgba(212,100,10,.2);border-radius:3px;margin-bottom:16px;font-size:13px;color:var(--saffron);}
-    .status-bar.v{display:flex;}
-    .spinner{width:15px;height:15px;border:2px solid rgba(212,100,10,.25);border-top-color:var(--saffron);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
-    @keyframes spin{to{transform:rotate(360deg);}}
-    .error-box{display:none;padding:14px 18px;background:rgba(180,30,30,.07);border:1px solid rgba(180,30,30,.25);border-radius:3px;color:#8b1a1a;font-size:13px;margin-bottom:16px;line-height:1.75;}
-    .error-box.v{display:block;}
+  /* ── MAIN LAYOUT ──────────────────────────────────────── */
+  main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    flex: 1;
+  }
 
-    /* ── OUTPUT ──────────────────────────────── */
-    .output-panel{display:none;background:var(--card);border:1px solid var(--rule);border-radius:6px;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.06);animation:fadeUp .4s ease;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-    .output-panel.v{display:block;}
-    .output-header{background:linear-gradient(135deg,var(--saffron),var(--deep));padding:16px 26px;display:flex;align-items:center;justify-content:space-between;}
-    .output-header-title{font-family:'Noto Sans Kannada',sans-serif;font-size:15px;font-weight:600;color:#fff;}
-    .output-header-sub{font-size:10px;color:rgba(255,255,255,.65);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
-    .output-actions{display:flex;gap:8px;}
-    .copy-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;padding:6px 14px;border-radius:3px;cursor:pointer;transition:background .2s;}
-    .copy-btn:hover{background:rgba(255,255,255,.28);}
-    .source-strip{background:rgba(212,100,10,.05);border-bottom:1px solid var(--rule);padding:9px 26px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px;}
-    .source-strip a{color:var(--saffron);text-decoration:none;word-break:break-all;}
-    .source-strip a:hover{text-decoration:underline;}
-    .output-body{padding:26px 32px;}
-    .article-title-kn{font-family:'Noto Sans Kannada',sans-serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1.45;margin-bottom:16px;border-bottom:1px solid var(--rule);padding-bottom:13px;}
-    .article-content-kn{font-family:'Noto Sans Kannada',sans-serif;font-size:16.5px;line-height:1.95;color:#2a1400;}
-    .article-content-kn p{margin-bottom:18px;text-align:justify;}
-    .article-content-kn p:first-child::first-letter{font-size:50px;font-weight:700;float:left;line-height:.8;margin:6px 10px 0 0;color:var(--saffron);}
-    .disclaimer-block{margin-top:24px;padding:14px 18px;background:rgba(196,154,47,.08);border-left:3px solid var(--gold);border-radius:0 3px 3px 0;}
-    .disclaimer-label{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
-    .disclaimer-text{font-size:12px;color:var(--muted);line-height:1.7;}
-    .disclaimer-text-kn{font-family:'Noto Sans Kannada',sans-serif;font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:6px;}
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+    header { padding: 18px 20px; }
+  }
 
-    /* ── FOOTER ──────────────────────────────── */
-    .footer{text-align:center;padding:16px;font-size:12px;color:var(--muted);letter-spacing:.04em;border-top:1px solid var(--rule);position:relative;z-index:1;}
-    .footer a{color:var(--saffron);text-decoration:none;font-weight:500;}
-    .footer a:hover{text-decoration:underline;}
+  /* ── INPUT PANEL ──────────────────────────────────────── */
+  .input-panel {
+    border-right: 1px solid var(--rule);
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-    @media(max-width:600px){
-      .masthead{padding:12px 14px;}
-      .masthead-title{font-size:18px;}
-      .stats-grid{grid-template-columns:1fr 1fr;}.stat-card.users{grid-column:span 2;}
-      .input-group{flex-direction:column;}
-      .output-body{padding:16px 14px;}
-      .login-card{padding:28px 18px;}
-      .modal-body{padding:18px 14px;}
-    }
-  </style>
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 8px;
+  }
+
+  /* Tab switcher */
+  .tabs {
+    display: flex;
+    border: 1.5px solid var(--rule);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-right: 1px solid var(--rule);
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn.active { background: var(--ink); color: var(--paper); }
+  .tab-btn:hover:not(.active) { background: var(--paper-dark); }
+
+  .tab-content { display: none; flex-direction: column; gap: 10px; }
+  .tab-content.active { display: flex; }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .url-row { display: flex; gap: 8px; }
+
+  .text-input, .url-input {
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--rule);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .text-input:focus, .url-input:focus { border-color: var(--accent); }
+
+  .fetch-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .fetch-btn:hover { background: var(--accent); }
+  .fetch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  textarea {
+    font-family: var(--serif);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 14px;
+    border: 1.5px solid var(--rule);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: var(--radius);
+    resize: vertical;
+    min-height: 280px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--rule); font-style: italic; }
+
+  .char-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .option-group { display: flex; flex-direction: column; gap: 6px; }
+
+  select {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--rule);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: var(--radius);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6356'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  select:focus { border-color: var(--accent); }
+
+  .keyword-input {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--rule);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: var(--radius);
+    outline: none;
+    width: 100%;
+    grid-column: 1 / -1;
+    transition: border-color 0.2s;
+  }
+  .keyword-input:focus { border-color: var(--accent); }
+  .keyword-input::placeholder { color: var(--rule); }
+
+  /* Submit */
+  .rewrite-btn {
+    font-family: var(--display);
+    font-size: 16px;
+    font-style: italic;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .rewrite-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
+  .rewrite-btn:active { transform: translateY(0); }
+  .rewrite-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .rewrite-btn .btn-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 2px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-bar.active { display: block; }
+  .progress-bar::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 40%;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: slide 1.2s ease-in-out infinite;
+  }
+  @keyframes slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(360%); }
+  }
+
+  /* Error box */
+  .error-box {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: #fbe9e4;
+    color: var(--accent);
+    border: 1px solid #f0c4b8;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: none;
+    line-height: 1.5;
+  }
+  .error-box.visible { display: block; }
+
+  /* ── OUTPUT PANEL ─────────────────────────────────────── */
+  .output-panel {
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--panel);
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 8px;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .action-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .action-btn.copied { background: var(--success); color: #fff; border-color: var(--success); }
+
+  /* Article stats */
+  .article-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px dashed var(--rule);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  .stat-chip span {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* Output content */
+  .output-content {
+    flex: 1;
+    min-height: 320px;
+  }
+
+  /* Placeholder state */
+  .placeholder-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    gap: 12px;
+    color: var(--rule);
+    text-align: center;
+  }
+
+  .placeholder-icon {
+    font-size: 48px;
+    opacity: 0.4;
+  }
+
+  .placeholder-text {
+    font-family: var(--display);
+    font-size: 18px;
+    font-style: italic;
+    color: var(--rule);
+  }
+
+  /* Article output */
+  .article-output {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    animation: fadeUp 0.5s ease both;
+  }
+  .article-output.visible { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .article-headline {
+    font-family: var(--display);
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  .article-body {
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ink);
+    white-space: pre-wrap;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .article-body::-webkit-scrollbar { width: 4px; }
+  .article-body::-webkit-scrollbar-track { background: transparent; }
+  .article-body::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+
+  /* SEO tags strip */
+  .seo-strip {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+  }
+  .seo-strip.visible { display: flex; }
+
+  .seo-tag-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    width: 100%;
+  }
+
+  .seo-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: #e8e3da;
+    color: var(--ink);
+    padding: 3px 9px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Streaming cursor */
+  .stream-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.9s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── FOOTER ───────────────────────────────────────────── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 3px double var(--ink);
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-note a { color: var(--muted); text-decoration: underline; }
+  .footer-note a:hover { color: var(--ink); }
+
+  @media (max-width: 860px) {
+    .input-panel, .output-panel { padding: 22px 18px; }
+    .options-grid { grid-template-columns: 1fr; }
+    footer { padding: 12px 18px; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ── TOP BAR ──────────────────────────────────── -->
-<div class="tv-topbar">
-  Powered by <a href="https://trendingverse.online/" target="_blank" rel="noopener">TrendingVerse.online</a>
-  &nbsp;·&nbsp; Your trusted Kannada news destination
-</div>
+<!-- ── MASTHEAD ────────────────────────────────────────────── -->
+<header>
+  <div class="masthead-left">
+    <span class="edition-tag">✦ Rewrite Engine v1.0</span>
+    <h1>The <span>Rewriter</span></h1>
+    <p class="tagline">Journalistic rewrites · SEO-optimised · Copyright-free</p>
+  </div>
+  <div class="api-area">
+    <span class="api-label">API Key</span>
+    <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
+    <button class="api-save-btn" onclick="saveApiKey()">Save</button>
+    <span id="api-status"></span>
+  </div>
+</header>
 
-<!-- ── LOGIN SCREEN ─────────────────────────────── -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="login-brand">
-      <div class="login-brand-logo">ಕ</div>
-      <div class="login-brand-name">
-        Kannada Translator
-        <span>by TrendingVerse</span>
+<!-- ── MAIN ───────────────────────────────────────────────── -->
+<main>
+
+  <!-- INPUT PANEL -->
+  <section class="input-panel">
+    <div class="panel-label">01 — Input Source</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('url')">🔗 URL</button>
+      <button class="tab-btn" onclick="switchTab('paste')">📋 Paste</button>
+    </div>
+
+    <!-- URL tab -->
+    <div class="tab-content active" id="tab-url">
+      <span class="field-label">Article URL</span>
+      <div class="url-row">
+        <input type="url" class="url-input" id="urlInput"
+          placeholder="https://example.com/article" />
+        <button class="fetch-btn" id="fetchBtn" onclick="fetchUrl()">Fetch</button>
+      </div>
+      <div class="error-box" id="fetchError"></div>
+      <textarea id="fetchedContent" placeholder="Fetched article content will appear here for review…" rows="8"></textarea>
+      <span class="char-count" id="urlCharCount">0 characters</span>
+    </div>
+
+    <!-- Paste tab -->
+    <div class="tab-content" id="tab-paste">
+      <span class="field-label">Paste Article Content</span>
+      <textarea id="pasteContent"
+        placeholder="Paste your article text here…&#10;&#10;The more complete the original, the better the rewrite will be." rows="10"></textarea>
+      <span class="char-count" id="pasteCharCount">0 characters</span>
+    </div>
+
+    <div class="panel-label" style="margin-top:4px;">02 — Options</div>
+
+    <div class="options-grid">
+      <div class="option-group">
+        <span class="field-label">Article Tone</span>
+        <select id="toneSelect">
+          <option value="journalistic">📰 Journalistic</option>
+          <option value="analytical">🔬 Analytical</option>
+          <option value="conversational">💬 Conversational</option>
+          <option value="investigative">🔍 Investigative</option>
+          <option value="editorial">✍️ Editorial</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <span class="field-label">Output Length</span>
+        <select id="lengthSelect">
+          <option value="same">≈ Same as original</option>
+          <option value="shorter">↓ Shorter (concise)</option>
+          <option value="longer">↑ Longer (detailed)</option>
+        </select>
+      </div>
+      <div class="option-group" style="grid-column: 1 / -1;">
+        <span class="field-label">Target SEO Keywords (comma-separated)</span>
+        <input type="text" class="keyword-input" id="keywordsInput"
+          placeholder="e.g.  AI tools, machine learning 2025, automation software" />
       </div>
     </div>
-    <div class="login-title">Welcome back</div>
-    <div class="login-sub">Sign in to translate · ಲಾಗಿನ್ ಮಾಡಿ</div>
 
-    <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Sign in with Google
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="error-box" id="rewriteError"></div>
+
+    <button class="rewrite-btn" id="rewriteBtn" onclick="rewriteArticle()">
+      <span class="btn-inner">
+        <span>✦</span>
+        <span>Rewrite Article</span>
+      </span>
     </button>
-    <div class="login-err" id="loginErr"></div>
+  </section>
 
-    <div class="login-footer">
-      <a href="https://trendingverse.online/" target="_blank" rel="noopener">🌐 Visit TrendingVerse.online</a>
-    </div>
-  </div>
-</div>
-
-<!-- ── APP SCREEN ────────────────────────────────── -->
-<div id="appScreen">
-
-  <header class="masthead">
-    <div class="masthead-brand">
-      <div class="masthead-logo">ಕ</div>
-      <div class="masthead-info">
-        <div class="masthead-kn">ಇಂಗ್ಲಿಷ್ ನಿಂದ ಕನ್ನಡಕ್ಕೆ</div>
-        <div class="masthead-title">Kannada <span>Translator</span></div>
-        <div class="masthead-sub">TrendingVerse · No API Key · Always Free</div>
-      </div>
-    </div>
-    <div class="masthead-right">
-      <div class="user-pill"><span class="dot"></span><span id="userEmail">—</span></div>
-      <button class="dash-btn" onclick="openDashboard()">📊 Dashboard</button>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
-    </div>
-  </header>
-
-  <div class="rule-ornament">✦ ✦ ✦</div>
-
-  <div class="container">
-
-    <div class="free-note">
-      <span class="icon">🎉</span>
-      <span><strong>Base translation is 100% free.</strong> Optionally add your <strong>Gemini key</strong> below to get a natural AI rewrite on top — uses only <strong>1 API call per article</strong> (~1500 tokens).</span>
-    </div>
-
-    <!-- Optional Gemini key for AI rewrite -->
-    <div class="apikey-panel" style="margin-bottom:18px;">
-      <div class="apikey-label">✨ Optional: Gemini AI Rewrite Key (uses ~1500 tokens per article)</div>
-      <div class="apikey-steps">
-        Without key: Google Translate (free, instant) &nbsp;·&nbsp; With key: Google Translate → Gemini polish (1 call/article)<br>
-        <strong>Get free key:</strong> <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> → Create API Key (starts with AIza…)
-      </div>
-      <div class="apikey-row">
-        <input class="apikey-input" id="geminiKey" type="password"
-          placeholder="AIzaSy… (optional — leave blank to use free translation only)"
-          autocomplete="off" spellcheck="false"/>
-        <button class="save-key-btn" onclick="saveGeminiKey()">Save</button>
-        <span class="key-saved-badge" id="keySavedBadge">✓ Saved</span>
+  <!-- OUTPUT PANEL -->
+  <section class="output-panel">
+    <div class="output-header">
+      <div class="panel-label" style="border: none; padding: 0;">03 — Rewritten Article</div>
+      <div class="output-actions">
+        <button class="action-btn" id="copyBtn" onclick="copyOutput()">
+          <span>⎘</span> Copy
+        </button>
+        <button class="action-btn" onclick="downloadTxt()">
+          <span>↓</span> .txt
+        </button>
+        <button class="action-btn" onclick="downloadHtml()">
+          <span>↓</span> .html
+        </button>
+        <button class="action-btn" onclick="clearOutput()">
+          <span>✕</span> Clear
+        </button>
       </div>
     </div>
 
-    <!-- Input mode tabs -->
-    <div class="section-label">Choose Input Method</div>
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="modeUrl" onclick="setMode('url')">🔗 Paste URL</button>
-      <button class="mode-tab" id="modeText" onclick="setMode('text')">📝 Paste Text</button>
+    <div class="article-stats" id="articleStats" style="display:none">
+      <div class="stat-chip">Words: <span id="wordCount">—</span></div>
+      <div class="stat-chip">Read Time: <span id="readTime">—</span></div>
+      <div class="stat-chip">Chars: <span id="charCount">—</span></div>
     </div>
 
-    <div class="input-panel">
-      <!-- URL mode -->
-      <div id="urlMode">
-        <div class="section-label">Article URL</div>
-        <div class="input-group">
-          <input class="url-input" id="urlInput" type="url"
-            placeholder="https://example.com/english-article"
-            autocomplete="off" spellcheck="false"/>
-          <button class="translate-btn" id="translateBtn" onclick="startTranslation()">
-            <span class="bt">ಅನುವಾದಿಸಿ &nbsp;Translate</span>
-            <span class="sp">⏳ Translating…</span>
-          </button>
-        </div>
+    <div class="output-content">
+      <!-- Placeholder -->
+      <div class="placeholder-state" id="placeholderState">
+        <div class="placeholder-icon">✦</div>
+        <div class="placeholder-text">Your rewritten article will appear here</div>
+        <p style="font-size:13px; color: var(--rule); font-family: var(--mono); letter-spacing:0.06em;">Paste content → set options → rewrite</p>
       </div>
 
-      <!-- Text mode -->
-      <div id="textMode" style="display:none;">
-        <div class="section-label">Paste Article Text</div>
-        <textarea class="paste-area" id="pasteArea"
-          placeholder="Paste the full English article text here and click Translate…"></textarea>
-        <div style="margin-top:10px;text-align:right;">
-          <button class="translate-btn" id="translateBtnText" onclick="startTranslation()">
-            <span class="bt">ಅನುವಾದಿಸಿ &nbsp;Translate</span>
-            <span class="sp">⏳ Translating…</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="options-row">
-        <label class="opt"><input type="checkbox" id="chkFormal" checked/> Formal Kannada (ಶಿಷ್ಟ)</label>
-        <label class="opt"><input type="checkbox" id="chkHeadings" checked/> Preserve headings</label>
-        <label class="opt"><input type="checkbox" id="chkSummary"/> Add English summary</label>
+      <!-- Article output -->
+      <div class="article-output" id="articleOutput">
+        <div class="article-headline" id="outputHeadline"></div>
+        <div class="article-body" id="outputBody"></div>
       </div>
     </div>
 
-    <div class="progress-bar-wrap" id="progressWrap">
-      <div class="progress-label">
-        <span id="progressLabel">Translating…</span>
-        <span id="progressPct">0%</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="seo-strip" id="seoStrip">
+      <span class="seo-tag-label">SEO Keywords Woven In</span>
     </div>
+  </section>
+</main>
 
-    <div class="status-bar" id="statusBar"><div class="spinner"></div><div id="statusText">Please wait…</div></div>
-    <div class="error-box" id="errorBox"></div>
+<!-- ── FOOTER ──────────────────────────────────────────────── -->
+<footer>
+  <span class="footer-note">API key stored in browser localStorage · never sent anywhere except Anthropic</span>
+  <span class="footer-note">Powered by <a href="https://anthropic.com" target="_blank">Claude (Anthropic)</a></span>
+</footer>
 
-    <!-- Output -->
-    <div class="output-panel" id="outputPanel">
-      <div class="output-header">
-        <div>
-          <div class="output-header-title">ಕನ್ನಡ ಅನುವಾದ</div>
-          <div class="output-header-sub">TrendingVerse Kannada Translation</div>
-        </div>
-        <div class="output-actions">
-          <button class="copy-btn" onclick="copyOutput()">📋 Copy</button>
-        </div>
-      </div>
-      <div class="source-strip">
-        <span>📰 Source:</span>
-        <a id="sourceLink" href="#" target="_blank" rel="noopener">—</a>
-      </div>
-      <div class="output-body">
-        <div class="article-title-kn" id="articleTitle"></div>
-        <div class="article-content-kn" id="articleContent"></div>
-        <div class="disclaimer-block">
-          <div class="disclaimer-label">⚠ Disclaimer / ಹಕ್ಕು ನಿರಾಕರಣೆ</div>
-          <div class="disclaimer-text">
-            This is a translated and editorially adapted Kannada rendition of the original English article, produced by <a href="https://trendingverse.online/" target="_blank" rel="noopener" style="color:var(--saffron);">TrendingVerse Translate Engine</a> for informational purposes only. All intellectual property rights of the original article remain with its respective author(s) and publisher(s).
-          </div>
-          <div class="disclaimer-text-kn">
-            ಈ ಲೇಖನವನ್ನು TrendingVerse Translate Engine ಮೂಲಕ ಅನುವಾದಿಸಲಾಗಿದ್ದು, ಕೇವಲ ಮಾಹಿತಿ ಉದ್ದೇಶಕ್ಕಾಗಿ ಮಾತ್ರ. ಮೂಲ ಲೇಖನದ ಎಲ್ಲ ಹಕ್ಕುಗಳು ಅದರ ಲೇಖಕರಿಗೆ ಸೇರುತ್ತವೆ.
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /container -->
-
-  <footer class="footer">
-    Powered by <a href="https://trendingverse.online/" target="_blank" rel="noopener">TrendingVerse Translate Engine (Free)</a>
-    &nbsp;·&nbsp; ಕನ್ನಡ ಅನುವಾದ ಸೇವೆ &nbsp;·&nbsp; For informational use only
-  </footer>
-
-</div><!-- /appScreen -->
-
-<!-- ── DASHBOARD MODAL ───────────────────────────── -->
-<div class="modal-overlay" id="dashModal" onclick="closeDashIfBg(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <h2>📊 Analytics Dashboard</h2>
-        <p>TrendingVerse Translate · Usage Overview</p>
-      </div>
-      <button class="modal-close" onclick="closeDashboard()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="stats-grid">
-        <div class="stat-card total">
-          <div class="stat-num" id="statTotal">—</div>
-          <div class="stat-label">Articles Translated<br>All Time</div>
-        </div>
-        <div class="stat-card today">
-          <div class="stat-num" id="statToday">—</div>
-          <div class="stat-label">Translated<br>Today</div>
-        </div>
-        <div class="stat-card users">
-          <div class="stat-num" id="statUsers">—</div>
-          <div class="stat-label">Registered<br>Users</div>
-        </div>
-      </div>
-
-      <div class="recent-list">
-        <h3>Recent Translations</h3>
-        <div id="recentList"><div class="dash-loading">⏳ Loading…</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Firebase compat SDK — works on GitHub Pages, no popup issues -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey:"AIzaSyChv74n2mnd5EQTceDFJOmkZJtHklIGXHY",
-    authDomain:"translator-app-707a1.firebaseapp.com",
-    projectId:"translator-app-707a1",
-    storageBucket:"translator-app-707a1.firebasestorage.app",
-    messagingSenderId:"526317377351",
-    appId:"1:526317377351:web:ec536c09210f928f045e62"
-  };
+// ── STATE ───────────────────────────────────────────────────
+let currentOutput = { headline: '', body: '', keywords: [] };
+let activeTab = 'url';
+let isStreaming = false;
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db   = firebase.firestore();
-  let currentUser = null;
+// ── API KEY ────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('rw_api_key');
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+    showStatus('saved', '✓ Key loaded');
+  }
 
-  const GOOGLE_SVG = `<svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google`;
+  // Char counters
+  document.getElementById('fetchedContent').addEventListener('input', () => updateCount('fetchedContent', 'urlCharCount'));
+  document.getElementById('pasteContent').addEventListener('input', () => updateCount('pasteContent', 'pasteCharCount'));
 
-  // ── Handle redirect result on page load ──────────────
-  auth.getRedirectResult().then(result => {
-    if (result && result.user) {
-      // User returned from Google redirect — handled by onAuthStateChanged
-      console.log('Redirect sign-in success:', result.user.email);
-    }
-  }).catch(err => {
-    console.error('Redirect result error:', err.message);
-    const errEl = document.getElementById('loginErr');
-    if (errEl) { errEl.textContent = 'Sign-in failed: ' + err.message; errEl.classList.add('v'); }
+  // Enter key on URL input
+  document.getElementById('urlInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') fetchUrl();
   });
+});
 
-  // ── Auth state listener ───────────────────────────────
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      currentUser = user;
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('appScreen').style.display   = 'block';
-      document.getElementById('userEmail').textContent     = user.email;
-      // Register user in Firestore (idempotent)
-      try {
-        const uRef = db.collection('users').doc(user.uid);
-        const snap = await uRef.get();
-        if (!snap.exists) {
-          await uRef.set({ email: user.email, createdAt: firebase.firestore.FieldValue.serverTimestamp(), translations: 0 });
-        }
-      } catch(e) { console.warn('Firestore user register failed:', e.message); }
-    } else {
-      currentUser = null;
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('appScreen').style.display   = 'none';
-    }
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    showStatus('error', '✗ Invalid key');
+    return;
+  }
+  localStorage.setItem('rw_api_key', key);
+  showStatus('saved', '✓ Saved');
+}
+
+function showStatus(type, msg) {
+  const el = document.getElementById('api-status');
+  el.className = type;
+  el.textContent = msg;
+  setTimeout(() => { if (el.className === type) el.style.display = 'none'; }, 2500);
+}
+
+function updateCount(textareaId, countId) {
+  const len = document.getElementById(textareaId).value.length;
+  document.getElementById(countId).textContent = len.toLocaleString() + ' characters';
+}
+
+// ── TAB SWITCH ─────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'url') || (i === 1 && tab === 'paste'));
   });
+  document.getElementById('tab-url').classList.toggle('active', tab === 'url');
+  document.getElementById('tab-paste').classList.toggle('active', tab === 'paste');
+}
 
-  // ── Sign in with Google via REDIRECT (works everywhere) ──
-  window.signInWithGoogle = () => {
-    const btn   = document.getElementById('googleBtn');
-    const errEl = document.getElementById('loginErr');
-    errEl.classList.remove('v');
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Redirecting to Google…';
-    const provider = new firebase.auth.GoogleAuthProvider();
-    // Use redirect — works on GitHub Pages, mobile, all browsers
-    auth.signInWithRedirect(provider).catch(err => {
-      errEl.textContent = 'Sign-in failed: ' + err.message;
-      errEl.classList.add('v');
-      btn.disabled = false;
-      btn.innerHTML = GOOGLE_SVG;
-    });
-  };
+// ── URL FETCH ──────────────────────────────────────────────
+async function fetchUrl() {
+  const url = document.getElementById('urlInput').value.trim();
+  const errBox = document.getElementById('fetchError');
+  errBox.classList.remove('visible');
 
-  window.doLogout = () => {
-    auth.signOut();
-  };
+  if (!url) { showFetchError('Please enter a URL.'); return; }
+  try { new URL(url); } catch { showFetchError('Invalid URL format.'); return; }
 
-  // ── Analytics: log a translation (compat syntax) ────
-  window.logTranslation = async (sourceUrl, titleKn) => {
-    if (!currentUser) return;
-    const today = new Date().toISOString().slice(0,10);
-    try {
-      await db.collection('translations').add({
-        uid: currentUser.uid,
-        email: currentUser.email,
-        url: sourceUrl || '(pasted text)',
-        titleKn: titleKn || '',
-        date: today,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      const globalRef = db.collection('stats').doc('global');
-      const snap = await globalRef.get();
-      if (snap.exists) {
-        await globalRef.update({
-          total: firebase.firestore.FieldValue.increment(1),
-          [`daily.${today}`]: firebase.firestore.FieldValue.increment(1)
-        });
-      } else {
-        await globalRef.set({ total: 1, daily: { [today]: 1 } });
-      }
-      await db.collection('users').doc(currentUser.uid).update({
-        translations: firebase.firestore.FieldValue.increment(1)
-      });
-    } catch(e) { console.warn('Analytics log failed:', e.message); }
-  };
+  const btn = document.getElementById('fetchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
 
-  // ── Dashboard (compat syntax) ─────────────────────
-  window.openDashboard = async () => {
-    document.getElementById('dashModal').classList.add('v');
-    document.getElementById('statTotal').textContent = '…';
-    document.getElementById('statToday').textContent = '…';
-    document.getElementById('statUsers').textContent = '…';
-    document.getElementById('recentList').innerHTML = '<div class="dash-loading">⏳ Loading…</div>';
-    try {
-      const today = new Date().toISOString().slice(0,10);
-      const globalSnap = await db.collection('stats').doc('global').get();
-      if (globalSnap.exists) {
-        const d = globalSnap.data();
-        document.getElementById('statTotal').textContent = (d.total || 0).toLocaleString();
-        document.getElementById('statToday').textContent = ((d.daily && d.daily[today]) || 0).toLocaleString();
-      } else {
-        document.getElementById('statTotal').textContent = '0';
-        document.getElementById('statToday').textContent = '0';
-      }
-      const usersSnap = await db.collection('users').get();
-      document.getElementById('statUsers').textContent = usersSnap.size.toLocaleString();
-      const tSnap = await db.collection('translations').orderBy('createdAt','desc').limit(10).get();
-      const recentEl = document.getElementById('recentList');
-      if (tSnap.empty) {
-        recentEl.innerHTML = '<div class="dash-empty">No translations yet. Start translating!</div>';
-      } else {
-        recentEl.innerHTML = '';
-        tSnap.forEach(docSnap => {
-          const d = docSnap.data();
-          const ts = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : new Date();
-          const timeStr = ts.toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-          const item = document.createElement('div');
-          item.className = 'recent-item';
-          item.innerHTML =
-            '<div style="overflow:hidden;">' +
-            '<div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px;">' + (d.titleKn || 'Untitled') + '</div>' +
-            '<div class="ri-url">' + (d.url || '') + '</div>' +
-            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">👤 ' + (d.email || '') + '</div>' +
-            '</div><div class="ri-time">' + timeStr + '</div>';
-          recentEl.appendChild(item);
-        });
-      }
-    } catch(e) {
-      document.getElementById('recentList').innerHTML = '<div class="dash-empty">Could not load data.</div>';
-      console.warn('Dashboard error:', e.message);
-    }
-  };
-
-  window.closeDashboard = () => document.getElementById('dashModal').classList.remove('v');
-  window.closeDashIfBg  = e => { if (e.target === document.getElementById('dashModal')) closeDashboard(); };
-</script>
-
-<!-- Translator logic -->
-<script>
-  let inputMode = 'url';
-
-  const PROXIES = [
-    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+  // CORS proxy — tries two approaches
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?${encodeURIComponent(url)}`
   ];
 
-  const KN_CONNECTORS = [
-    'ಅಲ್ಲದೆ, ','ಇದರ ಜೊತೆಗೆ, ','ವರದಿಗಳ ಪ್ರಕಾರ, ',
-    'ತಜ್ಞರ ಅಭಿಪ್ರಾಯದಂತೆ, ','ಗಮನಾರ್ಹ ಸಂಗತಿಯೆಂದರೆ, ',
-    'ಇದರ ಹಿನ್ನೆಲೆಯಲ್ಲಿ, ','ಇದು ಸ್ಪಷ್ಟಪಡಿಸುತ್ತದೆ ಎಂದರೆ, ',
-  ];
-
-  function setMode(mode) {
-    inputMode = mode;
-    document.getElementById('modeUrl').classList.toggle('active', mode === 'url');
-    document.getElementById('modeText').classList.toggle('active', mode === 'text');
-    document.getElementById('urlMode').style.display  = mode === 'url'  ? 'block' : 'none';
-    document.getElementById('textMode').style.display = mode === 'text' ? 'block' : 'none';
-  }
-
-  function setStatus(msg) {
-    document.getElementById('statusText').textContent = msg;
-    document.getElementById('statusBar').classList.add('v');
-  }
-  function hideStatus() { document.getElementById('statusBar').classList.remove('v'); }
-  function showError(html) {
-    const el = document.getElementById('errorBox');
-    el.innerHTML = html; el.classList.add('v'); hideStatus(); hideProgress();
-  }
-  function hideError() { document.getElementById('errorBox').classList.remove('v'); }
-
-  function setBtnLoading(on) {
-    ['translateBtn','translateBtnText'].forEach(id => {
-      const b = document.getElementById(id);
-      if (b) { b.disabled = on; b.classList.toggle('loading', on); }
-    });
-  }
-
-  function showProgress(label, pct) {
-    document.getElementById('progressWrap').classList.add('v');
-    document.getElementById('progressLabel').textContent = label;
-    document.getElementById('progressPct').textContent   = pct + '%';
-    document.getElementById('progressFill').style.width  = pct + '%';
-    document.getElementById('statusBar').classList.remove('v');
-  }
-  function hideProgress() { document.getElementById('progressWrap').classList.remove('v'); }
-
-  function stripHtml(html) {
-    const d = document.createElement('div');
-    d.innerHTML = html;
-    d.querySelectorAll('script,style,noscript,nav,header,footer,aside,form,button,iframe,svg,figure').forEach(e => e.remove());
-    let t = (d.innerText || d.textContent || '').trim();
-    t = t.replace(/\n{3,}/g,'\n\n').replace(/[ \t]+/g,' ');
-    return t;
-  }
-
-  async function tryProxy(fn, url) {
-    const res = await fetch(fn(url), { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('json')) { const d = await res.json(); return d.contents || null; }
-    return res.text();
-  }
-
-  async function fetchArticle(url) {
-    for (let i = 0; i < PROXIES.length; i++) {
-      setStatus(`Fetching article… (attempt ${i+1}/${PROXIES.length})`);
-      try {
-        const html = await tryProxy(PROXIES[i], url);
-        if (html && html.length > 200) return stripHtml(html);
-      } catch(_) {}
-    }
-    throw new Error('fetch_failed');
-  }
-
-  async function gtranslate(text) {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=kn&dt=t&q=${encodeURIComponent(text)}`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error(`Translate error ${res.status}`);
-    const data = await res.json();
-    return data[0].map(seg => seg[0]).join('');
-  }
-
-  function splitIntoParagraphs(text) {
-    return text.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 10);
-  }
-
-  function humanise(paragraphs) {
-    return paragraphs.map((para, i) => {
-      if (i > 0 && i % 3 === 0) {
-        const conn = KN_CONNECTORS[i % KN_CONNECTORS.length];
-        if (!para.match(/^[ಅ-ಹ]{1,2},/)) para = conn + para;
-      }
-      return para;
-    });
-  }
-
-  let savedGeminiKey = '';
-
-  function saveGeminiKey() {
-    const val = document.getElementById('geminiKey').value.trim();
-    if (val && !val.startsWith('AIza')) {
-      alert('That does not look like a valid Gemini key. It should start with "AIza…"'); return;
-    }
-    savedGeminiKey = val;
-    const badge = document.getElementById('keySavedBadge');
-    badge.classList.add('visible');
-    setTimeout(() => badge.classList.remove('visible'), 3000);
-  }
-
-  function getGeminiKey() {
-    return savedGeminiKey || document.getElementById('geminiKey').value.trim();
-  }
-
-  // ── Single Gemini call to polish the full translated text ──
-  // Sends ONE request for the whole article (~1500 tokens max)
-  async function geminiPolish(translatedKn, titleKn, formal) {
-    const key = getGeminiKey();
-    if (!key || !key.startsWith('AIza')) return null; // skip if no key
-
-    const tone = formal ? 'ಶಿಷ್ಟ ಕನ್ನಡ (formal literary)' : 'natural conversational Kannada';
-
-    // Cap input to 3000 chars to keep token usage low (~750 tokens in, ~750 tokens out)
-    const cappedText = translatedKn.substring(0, 3000);
-
-    const prompt = `You are a Kannada news editor. The following is a machine-translated Kannada article. 
-Lightly rewrite it to sound natural and journalistic in ${tone}.
-
-Rules:
-- Keep all the same information and meaning
-- Fix unnatural phrasing from machine translation
-- Use proper Kannada grammar and idioms
-- Keep proper nouns and numbers unchanged
-- Do NOT add new information
-- Respond ONLY with the rewritten Kannada text, nothing else
-
-TRANSLATED TEXT:
-${cappedText}`;
-
+  let html = null;
+  for (const proxy of proxies) {
     try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.5, maxOutputTokens: 1500 }
-          })
-        }
-      );
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        console.warn('Gemini polish skipped:', e.error?.message);
-        return null; // fall back to Google Translate output
-      }
-      const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-    } catch(e) {
-      console.warn('Gemini polish skipped:', e.message);
-      return null;
-    }
+      const res = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
+      if (res.ok) { html = await res.text(); break; }
+    } catch {}
   }
 
-  async function startTranslation() {
-    hideError();
-    document.getElementById('outputPanel').classList.remove('v');
+  btn.disabled = false;
+  btn.textContent = 'Fetch';
 
-    let rawText = '', sourceUrl = '';
-
-    if (inputMode === 'url') {
-      const urlVal = document.getElementById('urlInput').value.trim();
-      if (!urlVal) { showError('⚠ Please enter an article URL.'); return; }
-      if (!/^https?:\/\/.+/.test(urlVal)) { showError('⚠ URL must start with <strong>https://</strong>'); return; }
-      sourceUrl = urlVal;
-    } else {
-      rawText = document.getElementById('pasteArea').value.trim();
-      if (!rawText) { showError('⚠ Please paste the article text.'); return; }
-    }
-
-    setBtnLoading(true);
-
-    try {
-      if (inputMode === 'url') {
-        try { rawText = await fetchArticle(sourceUrl); }
-        catch {
-          throw new Error(
-            '⚠ <strong>Could not fetch article automatically.</strong><br><br>' +
-            'Switch to <strong>Paste Text</strong> mode above:<br>' +
-            'Open the article in browser → <strong>Ctrl+A</strong> → <strong>Ctrl+C</strong> → paste there'
-          );
-        }
-        if (rawText.length < 80) throw new Error('⚠ Page content too short. Use <strong>Paste Text</strong> mode instead.');
-      }
-
-      // ── Cap text to 4000 chars (saves ~60% quota vs old 12000) ──
-      rawText = rawText.substring(0, 4000);
-      const paragraphs = splitIntoParagraphs(rawText);
-      if (!paragraphs.length) throw new Error('⚠ Could not extract readable text.');
-
-      // ── Step 1: Google Translate (free, no quota) ──
-      showProgress('Translating title…', 8);
-      const titleKn = await gtranslate(paragraphs[0].substring(0, 120));
-
-      // Limit to 12 paragraphs max (enough for a full article)
-      const bodyParas  = paragraphs.slice(0, 12);
-      const translated = [];
-      for (let i = 0; i < bodyParas.length; i++) {
-        const pct = Math.round(10 + ((i / bodyParas.length) * 55));
-        showProgress(`Translating paragraph ${i+1} of ${bodyParas.length}…`, pct);
-        // Cap each paragraph to 400 chars — reduces GT calls and is enough context
-        translated.push(await gtranslate(bodyParas[i].substring(0, 400)));
-        await new Promise(r => setTimeout(r, 100));
-      }
-
-      const formal = document.getElementById('chkFormal').checked;
-      let rawKn = humanise(translated).join('\n\n');
-
-      // ── Step 2: Optional Gemini polish (1 single API call) ──
-      const gemKey = getGeminiKey();
-      if (gemKey && gemKey.startsWith('AIza')) {
-        showProgress('✨ AI polishing with Gemini (1 API call)…', 75);
-        const polished = await geminiPolish(rawKn, titleKn, formal);
-        if (polished) rawKn = polished;
-        showProgress('Finalising…', 95);
-      } else {
-        showProgress('Finalising…', 90);
-      }
-
-      // ── Optional English summary ──
-      let summaryBlock = '';
-      if (document.getElementById('chkSummary').checked && bodyParas.length > 3) {
-        const st = bodyParas.slice(-2).join(' ').substring(0, 300);
-        summaryBlock = '\n\nSummary (English):\n' + st + (st.length >= 300 ? '…' : '');
-      }
-
-      // Log analytics
-      if (window.logTranslation) await window.logTranslation(sourceUrl, titleKn);
-
-      hideProgress();
-      renderOutput(titleKn, rawKn + summaryBlock, sourceUrl);
-
-    } catch(err) {
-      showError(err.message || 'An unexpected error occurred.');
-    } finally {
-      setBtnLoading(false);
-    }
+  if (!html) {
+    showFetchError('Could not fetch URL — CORS proxy failed. Please paste the article content manually using the Paste tab.');
+    return;
   }
 
-  function renderOutput(title, content, url) {
-    document.getElementById('articleTitle').textContent = title;
-    const el = document.getElementById('articleContent');
-    el.innerHTML = '';
-    content.split(/\n\n+/).filter(p => p.trim()).forEach(para => {
-      const p = document.createElement('p');
-      p.textContent = para.trim(); el.appendChild(p);
-    });
-    const link = document.getElementById('sourceLink');
-    link.href = url || '#'; link.textContent = url || 'Pasted text';
-    document.getElementById('outputPanel').classList.add('v');
-    setTimeout(() => document.getElementById('outputPanel').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  const text = extractText(html);
+  if (text.length < 100) {
+    showFetchError('Could not extract article text from this URL. Please paste the content manually.');
+    return;
   }
 
-  function copyOutput() {
-    const title   = document.getElementById('articleTitle').textContent;
-    const content = document.getElementById('articleContent').innerText;
-    const disc    = '\n\n---\nTrendingVerse Translate Engine ಮೂಲಕ ಅನುವಾದಿಸಲಾಗಿದೆ | trendingverse.online\nAll rights of the original article belong to respective author(s).';
-    navigator.clipboard.writeText(`${title}\n\n${content}${disc}`).then(() => {
-      document.querySelectorAll('.copy-btn').forEach(btn => {
-        const orig = btn.textContent;
-        btn.textContent = '✓ Copied!';
-        setTimeout(() => btn.textContent = orig, 2000);
-      });
-    });
-  }
+  document.getElementById('fetchedContent').value = text;
+  updateCount('fetchedContent', 'urlCharCount');
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') startTranslation(); });
+function showFetchError(msg) {
+  const el = document.getElementById('fetchError');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('visible');
+}
+
+function extractText(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Remove noise
+  ['script','style','nav','header','footer','aside','iframe',
+   'noscript','form','button','[aria-hidden]'].forEach(sel => {
+    doc.querySelectorAll(sel).forEach(el => el.remove());
   });
-</script>
 
+  // Try article-specific selectors
+  const candidates = [
+    'article', '[itemprop="articleBody"]', '.post-content',
+    '.article-body', '.entry-content', 'main', '.content', '#content'
+  ];
+  for (const sel of candidates) {
+    const el = doc.querySelector(sel);
+    if (el) {
+      const t = el.innerText || el.textContent || '';
+      if (t.trim().length > 200) return cleanText(t);
+    }
+  }
+
+  // Fallback: body
+  return cleanText(doc.body.innerText || doc.body.textContent || '');
+}
+
+function cleanText(t) {
+  return t.replace(/\n{3,}/g, '\n\n').replace(/[ \t]+/g, ' ').trim();
+}
+
+// ── REWRITE ────────────────────────────────────────────────
+async function rewriteArticle() {
+  if (isStreaming) return;
+
+  const apiKey = localStorage.getItem('rw_api_key') || document.getElementById('apiKeyInput').value.trim();
+  if (!apiKey) { showRewriteError('Please enter and save your Anthropic API key first.'); return; }
+
+  const rawContent = activeTab === 'url'
+    ? document.getElementById('fetchedContent').value.trim()
+    : document.getElementById('pasteContent').value.trim();
+
+  if (!rawContent || rawContent.length < 50) {
+    showRewriteError('Please provide article content (at least 50 characters).'); return;
+  }
+
+  const tone = document.getElementById('toneSelect').value;
+  const length = document.getElementById('lengthSelect').value;
+  const keywords = document.getElementById('keywordsInput').value.trim();
+
+  const toneDesc = {
+    journalistic: 'a professional journalist writing for a quality newspaper (clear, factual, engaging, inverted-pyramid structure)',
+    analytical: 'an analytical writer who breaks down facts with precision, uses data, and provides deep insight',
+    conversational: 'a knowledgeable journalist writing in a conversational, accessible style that still maintains authority',
+    investigative: 'an investigative journalist — probing, well-sourced tone, revealing structure, building narrative tension',
+    editorial: 'an editorial writer with a distinct voice, offering both facts and informed perspective'
+  }[tone];
+
+  const lengthInstruction = {
+    same: 'Match the approximate length of the original article.',
+    shorter: 'Write a concise version — approximately 60–70% the length of the original, keeping only key points.',
+    longer: 'Write a more detailed version — approximately 130–150% the length of the original, adding context and depth.'
+  }[length];
+
+  const keywordInstruction = keywords
+    ? `Naturally weave in the following SEO keywords throughout the article (do NOT force them — integrate organically): ${keywords}.`
+    : 'Identify and naturally use 4–6 relevant SEO keywords for this topic.';
+
+  const systemPrompt = `You are ${toneDesc}.
+
+Your task is to REWRITE the provided article completely from scratch in your own words. Rules:
+1. NEVER translate — keep the same language as the original article.
+2. The rewrite must be 100% original — no copied phrases, no plagiarism, fully copyright-free.
+3. ${keywordInstruction}
+4. ${lengthInstruction}
+5. Structure: Start with a punchy headline (prefix with "HEADLINE: "), then write the body.
+6. Use clear paragraphs, engaging lead sentence, strong quotes (paraphrased), and a memorable closing.
+7. Do NOT include any meta-commentary, author notes, or explanation — only output the article.
+8. At the very end, on a new line, write "SEO_KEYWORDS: " followed by a comma-separated list of the exact SEO keywords you wove into the article.`;
+
+  const userPrompt = `Rewrite this article:\n\n${rawContent.slice(0, 14000)}`;
+
+  // UI: start
+  isStreaming = true;
+  setRewriteLoading(true);
+  clearOutput(false);
+  showArticleOutput('', '');
+
+  let fullText = '';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'messages-2023-12-15'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        stream: true,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API error ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          const delta = parsed.delta?.text || '';
+          if (delta) {
+            fullText += delta;
+            renderStreaming(fullText);
+          }
+        } catch {}
+      }
+    }
+
+    // Final render
+    finalizeOutput(fullText);
+
+  } catch (err) {
+    clearOutput(false);
+    showRewriteError('Error: ' + (err.message || 'Something went wrong. Check your API key.'));
+  } finally {
+    isStreaming = false;
+    setRewriteLoading(false);
+  }
+}
+
+function renderStreaming(text) {
+  const { headline, body } = parseOutput(text);
+  const headlineEl = document.getElementById('outputHeadline');
+  const bodyEl = document.getElementById('outputBody');
+
+  headlineEl.textContent = headline || '';
+  bodyEl.innerHTML = escapeHtml(body) + '<span class="stream-cursor"></span>';
+  bodyEl.scrollTop = bodyEl.scrollHeight;
+}
+
+function finalizeOutput(text) {
+  const { headline, body, keywords } = parseOutputFull(text);
+  currentOutput = { headline, body, keywords };
+
+  document.getElementById('outputHeadline').textContent = headline;
+  document.getElementById('outputBody').textContent = body;
+
+  // Stats
+  const words = body.split(/\s+/).filter(Boolean).length;
+  const readMin = Math.ceil(words / 200);
+  document.getElementById('wordCount').textContent = words.toLocaleString();
+  document.getElementById('readTime').textContent = readMin + ' min';
+  document.getElementById('charCount').textContent = body.length.toLocaleString();
+  document.getElementById('articleStats').style.display = 'flex';
+
+  // SEO strip
+  if (keywords.length > 0) {
+    const strip = document.getElementById('seoStrip');
+    strip.innerHTML = '<span class="seo-tag-label">SEO Keywords Woven In</span>';
+    keywords.forEach(kw => {
+      const tag = document.createElement('span');
+      tag.className = 'seo-tag';
+      tag.textContent = kw.trim();
+      strip.appendChild(tag);
+    });
+    strip.classList.add('visible');
+  }
+}
+
+function parseOutput(text) {
+  let headline = '';
+  let body = text;
+
+  const hlMatch = text.match(/^HEADLINE:\s*(.+)/m);
+  if (hlMatch) {
+    headline = hlMatch[1].trim();
+    body = text.slice(text.indexOf(hlMatch[0]) + hlMatch[0].length).trim();
+  }
+
+  // Remove SEO_KEYWORDS line from body during streaming
+  body = body.replace(/\nSEO_KEYWORDS:.*$/s, '').trim();
+  return { headline, body };
+}
+
+function parseOutputFull(text) {
+  const { headline, body: rawBody } = parseOutput(text);
+
+  // Extract keywords
+  let keywords = [];
+  const kwMatch = text.match(/SEO_KEYWORDS:\s*(.+)/);
+  if (kwMatch) {
+    keywords = kwMatch[1].split(',').map(k => k.trim()).filter(Boolean);
+  }
+
+  const body = rawBody.replace(/\nSEO_KEYWORDS:.*$/s, '').trim();
+  return { headline, body, keywords };
+}
+
+function showArticleOutput(headline, body) {
+  document.getElementById('placeholderState').style.display = 'none';
+  const out = document.getElementById('articleOutput');
+  out.classList.add('visible');
+  document.getElementById('outputHeadline').textContent = headline;
+  document.getElementById('outputBody').textContent = body;
+}
+
+function clearOutput(resetState = true) {
+  if (resetState) {
+    currentOutput = { headline: '', body: '', keywords: [] };
+    document.getElementById('rewriteError').classList.remove('visible');
+  }
+  document.getElementById('placeholderState').style.display = 'flex';
+  document.getElementById('articleOutput').classList.remove('visible');
+  document.getElementById('articleStats').style.display = 'none';
+  const strip = document.getElementById('seoStrip');
+  strip.classList.remove('visible');
+  strip.innerHTML = '<span class="seo-tag-label">SEO Keywords Woven In</span>';
+}
+
+function setRewriteLoading(loading) {
+  const btn = document.getElementById('rewriteBtn');
+  const bar = document.getElementById('progressBar');
+  btn.disabled = loading;
+  btn.querySelector('.btn-inner').innerHTML = loading
+    ? '<span>⏳</span><span>Rewriting…</span>'
+    : '<span>✦</span><span>Rewrite Article</span>';
+  bar.classList.toggle('active', loading);
+}
+
+function showRewriteError(msg) {
+  const el = document.getElementById('rewriteError');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('visible');
+}
+
+// ── OUTPUT ACTIONS ─────────────────────────────────────────
+function copyOutput() {
+  const text = (currentOutput.headline ? currentOutput.headline + '\n\n' : '') + currentOutput.body;
+  if (!text.trim()) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<span>⎘</span> Copy';
+    }, 2000);
+  });
+}
+
+function downloadTxt() {
+  if (!currentOutput.body) return;
+  const text = (currentOutput.headline ? currentOutput.headline + '\n\n' : '') + currentOutput.body;
+  download('rewritten-article.txt', 'text/plain', text);
+}
+
+function downloadHtml() {
+  if (!currentOutput.body) return;
+  const paragraphs = currentOutput.body
+    .split('\n\n').filter(Boolean)
+    .map(p => `<p>${escapeHtml(p)}</p>`).join('\n');
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>${escapeHtml(currentOutput.headline || 'Rewritten Article')}</title>
+<style>body{font-family:Georgia,serif;max-width:780px;margin:40px auto;padding:0 20px;line-height:1.8;color:#111}
+h1{font-size:2em;line-height:1.2;margin-bottom:24px}p{margin:0 0 1.2em}</style>
+</head><body>
+<h1>${escapeHtml(currentOutput.headline || '')}</h1>
+${paragraphs}
+</body></html>`;
+  download('rewritten-article.html', 'text/html', html);
+}
+
+function download(filename, type, content) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  a.click();
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 </body>
 </html>
