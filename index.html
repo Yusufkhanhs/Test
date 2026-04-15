@@ -7,649 +7,181 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --ink: #0f0e0c;
-    --paper: #f5f1eb;
-    --paper-dark: #ece7de;
-    --rule: #c8bfb0;
-    --accent: #b5401a;
-    --accent-dim: #d4622f;
-    --muted: #6b6356;
-    --success: #2a6b3c;
-    --panel: #faf7f2;
-    --shadow: 0 2px 12px rgba(15,14,12,0.10);
-    --shadow-lg: 0 8px 40px rgba(15,14,12,0.15);
-    --radius: 4px;
-    --mono: 'JetBrains Mono', monospace;
+    --ink: #0f0e0c; --paper: #f5f1eb; --paper-dark: #ece7de;
+    --rule: #c8bfb0; --accent: #b5401a; --accent-dim: #d4622f;
+    --muted: #6b6356; --success: #2a6b3c; --panel: #faf7f2;
+    --radius: 4px; --mono: 'JetBrains Mono', monospace;
     --serif: 'Source Serif 4', Georgia, serif;
     --display: 'Playfair Display', Georgia, serif;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--serif); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23b0a898' opacity='0.25'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; }
 
-  body {
-    font-family: var(--serif);
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
-
-  /* Newspaper texture overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='none'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23b0a898' opacity='0.25'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── MASTHEAD ─────────────────────────────────────────── */
-  header {
-    position: relative;
-    z-index: 1;
-    border-bottom: 3px double var(--ink);
-    padding: 24px 40px 18px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
+  header { position: relative; z-index: 1; border-bottom: 3px double var(--ink); padding: 20px 36px 16px; }
+  .header-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .masthead-left { display: flex; flex-direction: column; gap: 4px; }
+  .edition-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--rule); display: inline-block; padding: 2px 7px; border-radius: 2px; }
+  h1 { font-family: var(--display); font-size: clamp(26px, 5vw, 44px); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  h1 span { color: var(--accent); font-style: italic; font-weight: 400; }
+  .tagline { font-size: 13px; color: var(--muted); font-style: italic; letter-spacing: 0.02em; }
 
-  .edition-tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--rule);
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: 2px;
-  }
-
-  h1 {
-    font-family: var(--display);
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    color: var(--ink);
-  }
-
-  h1 span {
-    color: var(--accent);
-    font-style: italic;
-    font-weight: 400;
-  }
-
-  .tagline {
-    font-size: 13px;
-    color: var(--muted);
-    font-style: italic;
-    letter-spacing: 0.02em;
-  }
-
-  .api-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .api-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .api-input {
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 7px 12px;
-    border: 1.5px solid var(--rule);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: var(--radius);
-    width: 220px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .api-input:focus { border-color: var(--accent); }
-  .api-input::placeholder { color: var(--rule); }
-
-  .api-save-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    padding: 7px 14px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .api-save-btn:hover { background: var(--accent); }
-
-  #api-status {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 2px;
-    display: none;
-  }
+  .config-strip { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .config-field { display: flex; flex-direction: column; gap: 3px; }
+  .config-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .config-input { font-family: var(--mono); font-size: 12px; padding: 7px 11px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: var(--radius); outline: none; transition: border-color 0.2s; }
+  .config-input:focus { border-color: var(--accent); }
+  .config-input::placeholder { color: var(--rule); }
+  #apiKeyInput { width: 230px; } #proxyInput { width: 320px; }
+  .save-btn { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: none; padding: 7px 16px; border-radius: var(--radius); cursor: pointer; transition: background 0.2s; }
+  .save-btn:hover { background: var(--accent); }
+  #api-status { font-family: var(--mono); font-size: 10px; padding: 4px 8px; border-radius: 2px; display: none; }
   #api-status.saved { display: inline-block; background: #e6f2eb; color: var(--success); }
   #api-status.error { display: inline-block; background: #fbe9e4; color: var(--accent); }
 
-  /* ── MAIN LAYOUT ──────────────────────────────────────── */
-  main {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    flex: 1;
-  }
+  .proxy-notice { position: relative; z-index: 1; background: #fef9ec; border-bottom: 1px solid #e8d89a; padding: 10px 36px; font-family: var(--mono); font-size: 11px; color: #7a6820; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .proxy-notice a { color: #5a4a10; font-weight: 500; }
+  .proxy-notice.hidden { display: none; }
 
-  @media (max-width: 860px) {
-    main { grid-template-columns: 1fr; }
-    header { padding: 18px 20px; }
-  }
+  main { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; flex: 1; }
 
-  /* ── INPUT PANEL ──────────────────────────────────────── */
-  .input-panel {
-    border-right: 1px solid var(--rule);
-    padding: 32px 36px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .panel-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 8px;
-  }
-
-  /* Tab switcher */
-  .tabs {
-    display: flex;
-    border: 1.5px solid var(--rule);
-    border-radius: var(--radius);
-    overflow: hidden;
-    width: fit-content;
-  }
-
-  .tab-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--muted);
-    border: none;
-    padding: 8px 20px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    border-right: 1px solid var(--rule);
-  }
+  .input-panel { border-right: 1px solid var(--rule); padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; }
+  .panel-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+  .tabs { display: flex; border: 1.5px solid var(--rule); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+  .tab-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; color: var(--muted); border: none; padding: 8px 20px; cursor: pointer; transition: background 0.15s, color 0.15s; border-right: 1px solid var(--rule); }
   .tab-btn:last-child { border-right: none; }
   .tab-btn.active { background: var(--ink); color: var(--paper); }
   .tab-btn:hover:not(.active) { background: var(--paper-dark); }
-
   .tab-content { display: none; flex-direction: column; gap: 10px; }
   .tab-content.active { display: flex; }
-
-  .field-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
+  .field-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
   .url-row { display: flex; gap: 8px; }
-
-  .text-input, .url-input {
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 10px 14px;
-    border: 1.5px solid var(--rule);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: var(--radius);
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
-  .text-input:focus, .url-input:focus { border-color: var(--accent); }
-
-  .fetch-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    padding: 10px 16px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-    flex-shrink: 0;
-  }
+  .url-input { font-family: var(--mono); font-size: 13px; padding: 10px 14px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: var(--radius); outline: none; transition: border-color 0.2s; width: 100%; }
+  .url-input:focus { border-color: var(--accent); }
+  .fetch-btn { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; background: var(--ink); color: var(--paper); border: none; padding: 10px 16px; border-radius: var(--radius); cursor: pointer; transition: background 0.2s, opacity 0.2s; flex-shrink: 0; }
   .fetch-btn:hover { background: var(--accent); }
   .fetch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  textarea {
-    font-family: var(--serif);
-    font-size: 14px;
-    line-height: 1.7;
-    padding: 14px;
-    border: 1.5px solid var(--rule);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: var(--radius);
-    resize: vertical;
-    min-height: 280px;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
+  textarea { font-family: var(--serif); font-size: 14px; line-height: 1.7; padding: 14px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: var(--radius); resize: vertical; min-height: 220px; outline: none; transition: border-color 0.2s; width: 100%; }
   textarea:focus { border-color: var(--accent); }
   textarea::placeholder { color: var(--rule); font-style: italic; }
-
-  .char-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  /* Options */
-  .options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
+  .char-count { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .option-group { display: flex; flex-direction: column; gap: 6px; }
-
-  select {
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 8px 10px;
-    border: 1.5px solid var(--rule);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: var(--radius);
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6356'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 28px;
-  }
+  select { font-family: var(--mono); font-size: 12px; padding: 8px 10px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: var(--radius); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6356'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
   select:focus { border-color: var(--accent); }
-
-  .keyword-input {
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 8px 10px;
-    border: 1.5px solid var(--rule);
-    background: var(--panel);
-    color: var(--ink);
-    border-radius: var(--radius);
-    outline: none;
-    width: 100%;
-    grid-column: 1 / -1;
-    transition: border-color 0.2s;
-  }
+  .keyword-input { font-family: var(--mono); font-size: 12px; padding: 8px 10px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: var(--radius); outline: none; width: 100%; grid-column: 1/-1; transition: border-color 0.2s; }
   .keyword-input:focus { border-color: var(--accent); }
   .keyword-input::placeholder { color: var(--rule); }
-
-  /* Submit */
-  .rewrite-btn {
-    font-family: var(--display);
-    font-size: 16px;
-    font-style: italic;
-    background: var(--accent);
-    color: var(--paper);
-    border: none;
-    padding: 14px 28px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    letter-spacing: 0.02em;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-  }
+  .rewrite-btn { font-family: var(--display); font-size: 16px; font-style: italic; background: var(--accent); color: var(--paper); border: none; padding: 14px 28px; border-radius: var(--radius); cursor: pointer; transition: background 0.2s, transform 0.1s; letter-spacing: 0.02em; width: 100%; }
   .rewrite-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
   .rewrite-btn:active { transform: translateY(0); }
   .rewrite-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  .rewrite-btn .btn-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  /* Progress bar */
-  .progress-bar {
-    height: 2px;
-    background: var(--rule);
-    border-radius: 2px;
-    overflow: hidden;
-    display: none;
-  }
+  .rewrite-btn .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .progress-bar { height: 2px; background: var(--rule); border-radius: 2px; overflow: hidden; display: none; }
   .progress-bar.active { display: block; }
-  .progress-bar::after {
-    content: '';
-    display: block;
-    height: 100%;
-    width: 40%;
-    background: var(--accent);
-    border-radius: 2px;
-    animation: slide 1.2s ease-in-out infinite;
-  }
-  @keyframes slide {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(360%); }
-  }
-
-  /* Error box */
-  .error-box {
-    font-family: var(--mono);
-    font-size: 12px;
-    background: #fbe9e4;
-    color: var(--accent);
-    border: 1px solid #f0c4b8;
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    display: none;
-    line-height: 1.5;
-  }
+  .progress-bar::after { content: ''; display: block; height: 100%; width: 40%; background: var(--accent); border-radius: 2px; animation: slide 1.2s ease-in-out infinite; }
+  @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(360%); } }
+  .error-box { font-family: var(--mono); font-size: 12px; background: #fbe9e4; color: var(--accent); border: 1px solid #f0c4b8; border-radius: var(--radius); padding: 10px 14px; display: none; line-height: 1.6; }
   .error-box.visible { display: block; }
 
-  /* ── OUTPUT PANEL ─────────────────────────────────────── */
-  .output-panel {
-    padding: 32px 36px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background: var(--panel);
-  }
-
-  .output-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 8px;
-  }
-
-  .output-actions {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .action-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--rule);
-    padding: 5px 12px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
+  .output-panel { padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; background: var(--panel); }
+  .output-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+  .output-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .action-btn { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--muted); border: 1px solid var(--rule); padding: 5px 12px; border-radius: var(--radius); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
   .action-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .action-btn.copied { background: var(--success); color: #fff; border-color: var(--success); }
-
-  /* Article stats */
-  .article-stats {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .stat-chip {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px dashed var(--rule);
-    padding: 4px 10px;
-    border-radius: 2px;
-  }
-
-  .stat-chip span {
-    color: var(--ink);
-    font-weight: 500;
-  }
-
-  /* Output content */
-  .output-content {
-    flex: 1;
-    min-height: 320px;
-  }
-
-  /* Placeholder state */
-  .placeholder-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 280px;
-    gap: 12px;
-    color: var(--rule);
-    text-align: center;
-  }
-
-  .placeholder-icon {
-    font-size: 48px;
-    opacity: 0.4;
-  }
-
-  .placeholder-text {
-    font-family: var(--display);
-    font-size: 18px;
-    font-style: italic;
-    color: var(--rule);
-  }
-
-  /* Article output */
-  .article-output {
-    display: none;
-    flex-direction: column;
-    gap: 0;
-    animation: fadeUp 0.5s ease both;
-  }
+  .article-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat-chip { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border: 1px dashed var(--rule); padding: 4px 10px; border-radius: 2px; }
+  .stat-chip span { color: var(--ink); font-weight: 500; }
+  .output-content { flex: 1; min-height: 260px; }
+  .placeholder-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 240px; gap: 12px; text-align: center; }
+  .placeholder-icon { font-size: 48px; opacity: 0.25; }
+  .placeholder-text { font-family: var(--display); font-size: 18px; font-style: italic; color: var(--rule); }
+  .article-output { display: none; flex-direction: column; gap: 0; animation: fadeUp 0.5s ease both; }
   .article-output.visible { display: flex; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .article-headline {
-    font-family: var(--display);
-    font-size: clamp(20px, 2.5vw, 28px);
-    font-weight: 700;
-    line-height: 1.25;
-    color: var(--ink);
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-  }
-
-  .article-body {
-    font-family: var(--serif);
-    font-size: 15px;
-    line-height: 1.8;
-    color: var(--ink);
-    white-space: pre-wrap;
-    max-height: 520px;
-    overflow-y: auto;
-    padding-right: 8px;
-  }
-
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .article-headline { font-family: var(--display); font-size: clamp(18px,2.5vw,26px); font-weight: 700; line-height: 1.25; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 16px; }
+  .article-body { font-family: var(--serif); font-size: 15px; line-height: 1.8; white-space: pre-wrap; max-height: 480px; overflow-y: auto; padding-right: 8px; }
   .article-body::-webkit-scrollbar { width: 4px; }
-  .article-body::-webkit-scrollbar-track { background: transparent; }
   .article-body::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
-
-  /* SEO tags strip */
-  .seo-strip {
-    display: none;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--rule);
-  }
+  .seo-strip { display: none; flex-wrap: wrap; gap: 6px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--rule); }
   .seo-strip.visible { display: flex; }
-
-  .seo-tag-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    width: 100%;
-  }
-
-  .seo-tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    background: #e8e3da;
-    color: var(--ink);
-    padding: 3px 9px;
-    border-radius: 2px;
-    letter-spacing: 0.04em;
-  }
-
-  /* Streaming cursor */
-  .stream-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1em;
-    background: var(--accent);
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: blink 0.9s step-end infinite;
-  }
+  .seo-tag-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); width: 100%; }
+  .seo-tag { font-family: var(--mono); font-size: 11px; background: #e8e3da; color: var(--ink); padding: 3px 9px; border-radius: 2px; letter-spacing: 0.04em; }
+  .stream-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); margin-left: 2px; vertical-align: text-bottom; animation: blink 0.9s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  /* ── FOOTER ───────────────────────────────────────────── */
-  footer {
-    position: relative;
-    z-index: 1;
-    border-top: 3px double var(--ink);
-    padding: 12px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .footer-note {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
+  footer { position: relative; z-index: 1; border-top: 3px double var(--ink); padding: 12px 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer-note { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
   .footer-note a { color: var(--muted); text-decoration: underline; }
-  .footer-note a:hover { color: var(--ink); }
 
   @media (max-width: 860px) {
-    .input-panel, .output-panel { padding: 22px 18px; }
+    main { grid-template-columns: 1fr; }
+    header, .proxy-notice, footer { padding-left: 18px; padding-right: 18px; }
+    .input-panel, .output-panel { padding: 20px 16px; }
     .options-grid { grid-template-columns: 1fr; }
-    footer { padding: 12px 18px; }
+    #apiKeyInput { width: 100%; } #proxyInput { width: 100%; }
   }
 </style>
 </head>
 <body>
 
-<!-- ── MASTHEAD ────────────────────────────────────────────── -->
 <header>
-  <div class="masthead-left">
-    <span class="edition-tag">✦ Rewrite Engine v1.0</span>
-    <h1>The <span>Rewriter</span></h1>
-    <p class="tagline">Journalistic rewrites · SEO-optimised · Copyright-free</p>
+  <div class="header-top">
+    <div class="masthead-left">
+      <span class="edition-tag">✦ Rewrite Engine v2.0</span>
+      <h1>The <span>Rewriter</span></h1>
+      <p class="tagline">Journalistic rewrites · SEO-optimised · Copyright-free</p>
+    </div>
   </div>
-  <div class="api-area">
-    <span class="api-label">API Key</span>
-    <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
-    <button class="api-save-btn" onclick="saveApiKey()">Save</button>
+  <div class="config-strip">
+    <div class="config-field">
+      <span class="config-label">Anthropic API Key</span>
+      <input type="password" class="config-input" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" />
+    </div>
+    <div class="config-field">
+      <span class="config-label">Proxy URL — your Cloudflare Worker</span>
+      <input type="url" class="config-input" id="proxyInput" placeholder="https://rewriter.yourname.workers.dev" />
+    </div>
+    <button class="save-btn" onclick="saveConfig()">Save</button>
     <span id="api-status"></span>
   </div>
 </header>
 
-<!-- ── MAIN ───────────────────────────────────────────────── -->
-<main>
+<div class="proxy-notice" id="proxyNotice">
+  ⚠ No proxy configured — browsers can't call Anthropic directly due to CORS.
+  Deploy the <strong>worker.js</strong> to Cloudflare (free, 3 min) then paste the Worker URL above.
+</div>
 
-  <!-- INPUT PANEL -->
+<main>
   <section class="input-panel">
     <div class="panel-label">01 — Input Source</div>
-
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('url')">🔗 URL</button>
       <button class="tab-btn" onclick="switchTab('paste')">📋 Paste</button>
     </div>
 
-    <!-- URL tab -->
     <div class="tab-content active" id="tab-url">
       <span class="field-label">Article URL</span>
       <div class="url-row">
-        <input type="url" class="url-input" id="urlInput"
-          placeholder="https://example.com/article" />
+        <input type="url" class="url-input" id="urlInput" placeholder="https://example.com/article" />
         <button class="fetch-btn" id="fetchBtn" onclick="fetchUrl()">Fetch</button>
       </div>
       <div class="error-box" id="fetchError"></div>
-      <textarea id="fetchedContent" placeholder="Fetched article content will appear here for review…" rows="8"></textarea>
+      <textarea id="fetchedContent" placeholder="Fetched article content will appear here for review…" rows="7"></textarea>
       <span class="char-count" id="urlCharCount">0 characters</span>
     </div>
 
-    <!-- Paste tab -->
     <div class="tab-content" id="tab-paste">
       <span class="field-label">Paste Article Content</span>
-      <textarea id="pasteContent"
-        placeholder="Paste your article text here…&#10;&#10;The more complete the original, the better the rewrite will be." rows="10"></textarea>
+      <textarea id="pasteContent" placeholder="Paste your article text here…" rows="9"></textarea>
       <span class="char-count" id="pasteCharCount">0 characters</span>
     </div>
 
     <div class="panel-label" style="margin-top:4px;">02 — Options</div>
-
     <div class="options-grid">
       <div class="option-group">
-        <span class="field-label">Article Tone</span>
+        <span class="field-label">Tone</span>
         <select id="toneSelect">
           <option value="journalistic">📰 Journalistic</option>
           <option value="analytical">🔬 Analytical</option>
@@ -659,283 +191,195 @@
         </select>
       </div>
       <div class="option-group">
-        <span class="field-label">Output Length</span>
+        <span class="field-label">Length</span>
         <select id="lengthSelect">
           <option value="same">≈ Same as original</option>
           <option value="shorter">↓ Shorter (concise)</option>
           <option value="longer">↑ Longer (detailed)</option>
         </select>
       </div>
-      <div class="option-group" style="grid-column: 1 / -1;">
-        <span class="field-label">Target SEO Keywords (comma-separated)</span>
-        <input type="text" class="keyword-input" id="keywordsInput"
-          placeholder="e.g.  AI tools, machine learning 2025, automation software" />
+      <div class="option-group" style="grid-column:1/-1">
+        <span class="field-label">SEO Keywords (comma-separated)</span>
+        <input type="text" class="keyword-input" id="keywordsInput" placeholder="e.g. AI tools, machine learning 2025, automation software" />
       </div>
     </div>
 
     <div class="progress-bar" id="progressBar"></div>
     <div class="error-box" id="rewriteError"></div>
-
     <button class="rewrite-btn" id="rewriteBtn" onclick="rewriteArticle()">
-      <span class="btn-inner">
-        <span>✦</span>
-        <span>Rewrite Article</span>
-      </span>
+      <span class="btn-inner"><span>✦</span><span>Rewrite Article</span></span>
     </button>
   </section>
 
-  <!-- OUTPUT PANEL -->
   <section class="output-panel">
     <div class="output-header">
-      <div class="panel-label" style="border: none; padding: 0;">03 — Rewritten Article</div>
+      <div class="panel-label" style="border:none;padding:0;">03 — Rewritten Article</div>
       <div class="output-actions">
-        <button class="action-btn" id="copyBtn" onclick="copyOutput()">
-          <span>⎘</span> Copy
-        </button>
-        <button class="action-btn" onclick="downloadTxt()">
-          <span>↓</span> .txt
-        </button>
-        <button class="action-btn" onclick="downloadHtml()">
-          <span>↓</span> .html
-        </button>
-        <button class="action-btn" onclick="clearOutput()">
-          <span>✕</span> Clear
-        </button>
+        <button class="action-btn" id="copyBtn" onclick="copyOutput()"><span>⎘</span> Copy</button>
+        <button class="action-btn" onclick="downloadTxt()"><span>↓</span> .txt</button>
+        <button class="action-btn" onclick="downloadHtml()"><span>↓</span> .html</button>
+        <button class="action-btn" onclick="clearOutput()"><span>✕</span> Clear</button>
       </div>
     </div>
-
     <div class="article-stats" id="articleStats" style="display:none">
       <div class="stat-chip">Words: <span id="wordCount">—</span></div>
       <div class="stat-chip">Read Time: <span id="readTime">—</span></div>
       <div class="stat-chip">Chars: <span id="charCount">—</span></div>
     </div>
-
     <div class="output-content">
-      <!-- Placeholder -->
       <div class="placeholder-state" id="placeholderState">
         <div class="placeholder-icon">✦</div>
         <div class="placeholder-text">Your rewritten article will appear here</div>
-        <p style="font-size:13px; color: var(--rule); font-family: var(--mono); letter-spacing:0.06em;">Paste content → set options → rewrite</p>
+        <p style="font-size:13px;color:var(--rule);font-family:var(--mono);">Paste content → set options → rewrite</p>
       </div>
-
-      <!-- Article output -->
       <div class="article-output" id="articleOutput">
         <div class="article-headline" id="outputHeadline"></div>
         <div class="article-body" id="outputBody"></div>
       </div>
     </div>
-
     <div class="seo-strip" id="seoStrip">
       <span class="seo-tag-label">SEO Keywords Woven In</span>
     </div>
   </section>
 </main>
 
-<!-- ── FOOTER ──────────────────────────────────────────────── -->
 <footer>
-  <span class="footer-note">API key stored in browser localStorage · never sent anywhere except Anthropic</span>
+  <span class="footer-note">API key & proxy URL stored in your browser only · never shared</span>
   <span class="footer-note">Powered by <a href="https://anthropic.com" target="_blank">Claude (Anthropic)</a></span>
 </footer>
 
 <script>
-// ── STATE ───────────────────────────────────────────────────
-let currentOutput = { headline: '', body: '', keywords: [] };
-let activeTab = 'url';
-let isStreaming = false;
+let currentOutput = { headline:'', body:'', keywords:[] };
+let activeTab = 'url', isStreaming = false;
 
-// ── API KEY ────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('rw_api_key');
-  if (saved) {
-    document.getElementById('apiKeyInput').value = saved;
-    showStatus('saved', '✓ Key loaded');
-  }
-
-  // Char counters
-  document.getElementById('fetchedContent').addEventListener('input', () => updateCount('fetchedContent', 'urlCharCount'));
-  document.getElementById('pasteContent').addEventListener('input', () => updateCount('pasteContent', 'pasteCharCount'));
-
-  // Enter key on URL input
-  document.getElementById('urlInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') fetchUrl();
-  });
+  const k = localStorage.getItem('rw_api_key')   || '';
+  const p = localStorage.getItem('rw_proxy_url') || '';
+  if (k) document.getElementById('apiKeyInput').value = k;
+  if (p) document.getElementById('proxyInput').value  = p;
+  updateProxyNotice(p);
+  document.getElementById('fetchedContent').addEventListener('input', () => updateCount('fetchedContent','urlCharCount'));
+  document.getElementById('pasteContent').addEventListener('input',   () => updateCount('pasteContent','pasteCharCount'));
+  document.getElementById('urlInput').addEventListener('keydown', e => { if(e.key==='Enter') fetchUrl(); });
 });
 
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key.startsWith('sk-ant-')) {
-    showStatus('error', '✗ Invalid key');
-    return;
-  }
+function saveConfig() {
+  const key   = document.getElementById('apiKeyInput').value.trim();
+  const proxy = document.getElementById('proxyInput').value.trim();
+  if (!key.startsWith('sk-ant-')) { showStatus('error','✗ Invalid API key'); return; }
+  if (!proxy || !proxy.startsWith('http')) { showStatus('error','✗ Invalid proxy URL'); return; }
   localStorage.setItem('rw_api_key', key);
-  showStatus('saved', '✓ Saved');
+  localStorage.setItem('rw_proxy_url', proxy);
+  showStatus('saved','✓ Saved');
+  updateProxyNotice(proxy);
+}
+
+function updateProxyNotice(proxy) {
+  document.getElementById('proxyNotice').classList.toggle('hidden', !!proxy);
 }
 
 function showStatus(type, msg) {
   const el = document.getElementById('api-status');
-  el.className = type;
-  el.textContent = msg;
-  setTimeout(() => { if (el.className === type) el.style.display = 'none'; }, 2500);
+  el.className = type; el.textContent = msg;
+  setTimeout(() => el.style.display='none', 3000);
 }
 
-function updateCount(textareaId, countId) {
-  const len = document.getElementById(textareaId).value.length;
-  document.getElementById(countId).textContent = len.toLocaleString() + ' characters';
+function updateCount(id, cid) {
+  document.getElementById(cid).textContent = document.getElementById(id).value.length.toLocaleString() + ' characters';
 }
 
-// ── TAB SWITCH ─────────────────────────────────────────────
 function switchTab(tab) {
   activeTab = tab;
-  document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', (i === 0 && tab === 'url') || (i === 1 && tab === 'paste'));
-  });
-  document.getElementById('tab-url').classList.toggle('active', tab === 'url');
-  document.getElementById('tab-paste').classList.toggle('active', tab === 'paste');
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active', (i===0&&tab==='url')||(i===1&&tab==='paste')));
+  document.getElementById('tab-url').classList.toggle('active',   tab==='url');
+  document.getElementById('tab-paste').classList.toggle('active', tab==='paste');
 }
 
-// ── URL FETCH ──────────────────────────────────────────────
 async function fetchUrl() {
   const url = document.getElementById('urlInput').value.trim();
-  const errBox = document.getElementById('fetchError');
-  errBox.classList.remove('visible');
-
+  document.getElementById('fetchError').classList.remove('visible');
   if (!url) { showFetchError('Please enter a URL.'); return; }
-  try { new URL(url); } catch { showFetchError('Invalid URL format.'); return; }
-
+  try { new URL(url); } catch { showFetchError('Invalid URL.'); return; }
   const btn = document.getElementById('fetchBtn');
-  btn.disabled = true;
-  btn.textContent = 'Fetching…';
-
-  // CORS proxy — tries two approaches
+  btn.disabled = true; btn.textContent = 'Fetching…';
   const proxies = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
     `https://corsproxy.io/?${encodeURIComponent(url)}`
   ];
-
   let html = null;
-  for (const proxy of proxies) {
-    try {
-      const res = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
-      if (res.ok) { html = await res.text(); break; }
-    } catch {}
+  for (const p of proxies) {
+    try { const r = await fetch(p,{signal:AbortSignal.timeout(12000)}); if(r.ok){html=await r.text();break;} } catch {}
   }
-
-  btn.disabled = false;
-  btn.textContent = 'Fetch';
-
-  if (!html) {
-    showFetchError('Could not fetch URL — CORS proxy failed. Please paste the article content manually using the Paste tab.');
-    return;
-  }
-
+  btn.disabled = false; btn.textContent = 'Fetch';
+  if (!html) { showFetchError('CORS proxy failed. Please use the Paste tab instead.'); return; }
   const text = extractText(html);
-  if (text.length < 100) {
-    showFetchError('Could not extract article text from this URL. Please paste the content manually.');
-    return;
-  }
-
+  if (text.length < 100) { showFetchError('Could not extract text. Please paste manually.'); return; }
   document.getElementById('fetchedContent').value = text;
-  updateCount('fetchedContent', 'urlCharCount');
+  updateCount('fetchedContent','urlCharCount');
 }
 
 function showFetchError(msg) {
   const el = document.getElementById('fetchError');
-  el.textContent = '⚠ ' + msg;
-  el.classList.add('visible');
+  el.textContent = '⚠ ' + msg; el.classList.add('visible');
 }
 
 function extractText(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  // Remove noise
-  ['script','style','nav','header','footer','aside','iframe',
-   'noscript','form','button','[aria-hidden]'].forEach(sel => {
-    doc.querySelectorAll(sel).forEach(el => el.remove());
-  });
-
-  // Try article-specific selectors
-  const candidates = [
-    'article', '[itemprop="articleBody"]', '.post-content',
-    '.article-body', '.entry-content', 'main', '.content', '#content'
-  ];
-  for (const sel of candidates) {
+  const doc = new DOMParser().parseFromString(html,'text/html');
+  ['script','style','nav','header','footer','aside','iframe','noscript'].forEach(s=>doc.querySelectorAll(s).forEach(e=>e.remove()));
+  for (const sel of ['article','[itemprop="articleBody"]','.post-content','.article-body','.entry-content','main']) {
     const el = doc.querySelector(sel);
-    if (el) {
-      const t = el.innerText || el.textContent || '';
-      if (t.trim().length > 200) return cleanText(t);
-    }
+    if (el) { const t = (el.innerText||el.textContent||'').trim(); if(t.length>200) return t.replace(/\n{3,}/g,'\n\n').replace(/[ \t]+/g,' ').trim(); }
   }
-
-  // Fallback: body
-  return cleanText(doc.body.innerText || doc.body.textContent || '');
+  return (doc.body.innerText||doc.body.textContent||'').replace(/\n{3,}/g,'\n\n').replace(/[ \t]+/g,' ').trim();
 }
 
-function cleanText(t) {
-  return t.replace(/\n{3,}/g, '\n\n').replace(/[ \t]+/g, ' ').trim();
-}
-
-// ── REWRITE ────────────────────────────────────────────────
 async function rewriteArticle() {
   if (isStreaming) return;
-
-  const apiKey = localStorage.getItem('rw_api_key') || document.getElementById('apiKeyInput').value.trim();
-  if (!apiKey) { showRewriteError('Please enter and save your Anthropic API key first.'); return; }
-
-  const rawContent = activeTab === 'url'
+  const apiKey   = localStorage.getItem('rw_api_key')   || document.getElementById('apiKeyInput').value.trim();
+  const proxyUrl = localStorage.getItem('rw_proxy_url') || document.getElementById('proxyInput').value.trim();
+  if (!apiKey)   { showRewriteError('Please enter and save your Anthropic API key.'); return; }
+  if (!proxyUrl) { showRewriteError('No proxy URL. Deploy worker.js to Cloudflare Workers and paste the URL above.'); return; }
+  const rawContent = activeTab==='url'
     ? document.getElementById('fetchedContent').value.trim()
     : document.getElementById('pasteContent').value.trim();
+  if (!rawContent || rawContent.length < 50) { showRewriteError('Please provide article content (min 50 chars).'); return; }
 
-  if (!rawContent || rawContent.length < 50) {
-    showRewriteError('Please provide article content (at least 50 characters).'); return;
-  }
-
-  const tone = document.getElementById('toneSelect').value;
-  const length = document.getElementById('lengthSelect').value;
-  const keywords = document.getElementById('keywordsInput').value.trim();
-
-  const toneDesc = {
+  const toneMap = {
     journalistic: 'a professional journalist writing for a quality newspaper (clear, factual, engaging, inverted-pyramid structure)',
-    analytical: 'an analytical writer who breaks down facts with precision, uses data, and provides deep insight',
-    conversational: 'a knowledgeable journalist writing in a conversational, accessible style that still maintains authority',
-    investigative: 'an investigative journalist — probing, well-sourced tone, revealing structure, building narrative tension',
-    editorial: 'an editorial writer with a distinct voice, offering both facts and informed perspective'
-  }[tone];
-
-  const lengthInstruction = {
-    same: 'Match the approximate length of the original article.',
-    shorter: 'Write a concise version — approximately 60–70% the length of the original, keeping only key points.',
-    longer: 'Write a more detailed version — approximately 130–150% the length of the original, adding context and depth.'
-  }[length];
-
-  const keywordInstruction = keywords
-    ? `Naturally weave in the following SEO keywords throughout the article (do NOT force them — integrate organically): ${keywords}.`
+    analytical:   'an analytical writer who breaks down facts with precision and provides deep insight',
+    conversational:'a knowledgeable journalist writing in a conversational, accessible yet authoritative style',
+    investigative: 'an investigative journalist — probing tone, revealing structure, building narrative tension',
+    editorial:    'an editorial writer with a distinct voice, combining facts with informed perspective'
+  };
+  const lengthMap = {
+    same:    'Match the approximate length of the original.',
+    shorter: 'Write a concise version — approximately 60–70% of the original length.',
+    longer:  'Write a more detailed version — approximately 130–150% of the original.'
+  };
+  const keywords = document.getElementById('keywordsInput').value.trim();
+  const kwInstruction = keywords
+    ? `Naturally weave in these SEO keywords (organically, not forced): ${keywords}.`
     : 'Identify and naturally use 4–6 relevant SEO keywords for this topic.';
 
-  const systemPrompt = `You are ${toneDesc}.
+  const systemPrompt = `You are ${toneMap[document.getElementById('toneSelect').value]}.
+Rewrite the article completely from scratch. Rules:
+1. NEVER translate — keep the exact same language as the original.
+2. 100% original — no copied phrases, fully copyright-free.
+3. ${kwInstruction}
+4. ${lengthMap[document.getElementById('lengthSelect').value]}
+5. Start with "HEADLINE: " followed by a punchy headline, then write the body.
+6. Clear paragraphs, strong lead, memorable close.
+7. Output article only — no meta-commentary.
+8. End with "SEO_KEYWORDS: " followed by comma-separated keywords used.`;
 
-Your task is to REWRITE the provided article completely from scratch in your own words. Rules:
-1. NEVER translate — keep the same language as the original article.
-2. The rewrite must be 100% original — no copied phrases, no plagiarism, fully copyright-free.
-3. ${keywordInstruction}
-4. ${lengthInstruction}
-5. Structure: Start with a punchy headline (prefix with "HEADLINE: "), then write the body.
-6. Use clear paragraphs, engaging lead sentence, strong quotes (paraphrased), and a memorable closing.
-7. Do NOT include any meta-commentary, author notes, or explanation — only output the article.
-8. At the very end, on a new line, write "SEO_KEYWORDS: " followed by a comma-separated list of the exact SEO keywords you wove into the article.`;
-
-  const userPrompt = `Rewrite this article:\n\n${rawContent.slice(0, 14000)}`;
-
-  // UI: start
   isStreaming = true;
   setRewriteLoading(true);
   clearOutput(false);
-  showArticleOutput('', '');
-
-  let fullText = '';
+  showArticleOutput('','');
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(proxyUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -945,210 +389,130 @@ Your task is to REWRITE the provided article completely from scratch in your own
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        stream: true,
+        max_tokens: 4096, stream: true,
         system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
+        messages: [{ role:'user', content:`Rewrite this article:\n\n${rawContent.slice(0,14000)}` }]
       })
     });
 
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `API error ${response.status}`);
+    if (!res.ok) {
+      let msg = `API error ${res.status}`;
+      try { const d = await res.json(); msg = d.error?.message || msg; } catch {}
+      throw new Error(msg);
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', full = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
+      buf += dec.decode(value, {stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
-        if (data === '[DONE]') continue;
-        try {
-          const parsed = JSON.parse(data);
-          const delta = parsed.delta?.text || '';
-          if (delta) {
-            fullText += delta;
-            renderStreaming(fullText);
-          }
-        } catch {}
+        if (data==='[DONE]') continue;
+        try { const d = JSON.parse(data); const t = d.delta?.text||''; if(t){full+=t; renderStreaming(full);} } catch {}
       }
     }
-
-    // Final render
-    finalizeOutput(fullText);
+    finalizeOutput(full);
 
   } catch (err) {
     clearOutput(false);
-    showRewriteError('Error: ' + (err.message || 'Something went wrong. Check your API key.'));
+    showRewriteError('Error: ' + (err.message||'Check API key and proxy URL.'));
   } finally {
-    isStreaming = false;
-    setRewriteLoading(false);
+    isStreaming = false; setRewriteLoading(false);
   }
 }
 
-function renderStreaming(text) {
-  const { headline, body } = parseOutput(text);
-  const headlineEl = document.getElementById('outputHeadline');
-  const bodyEl = document.getElementById('outputBody');
+function parseRaw(text) {
+  let headline='', body=text;
+  const m = text.match(/^HEADLINE:\s*(.+)/m);
+  if (m) { headline=m[1].trim(); body=text.slice(text.indexOf(m[0])+m[0].length).trim(); }
+  body = body.replace(/\nSEO_KEYWORDS:.*$/s,'').trim();
+  return {headline, body};
+}
 
-  headlineEl.textContent = headline || '';
-  bodyEl.innerHTML = escapeHtml(body) + '<span class="stream-cursor"></span>';
-  bodyEl.scrollTop = bodyEl.scrollHeight;
+function renderStreaming(text) {
+  const {headline, body} = parseRaw(text);
+  document.getElementById('outputHeadline').textContent = headline||'';
+  document.getElementById('outputBody').innerHTML = escHtml(body)+'<span class="stream-cursor"></span>';
+  document.getElementById('outputBody').scrollTop = 9999;
 }
 
 function finalizeOutput(text) {
-  const { headline, body, keywords } = parseOutputFull(text);
-  currentOutput = { headline, body, keywords };
-
+  const {headline, body} = parseRaw(text);
+  let keywords=[];
+  const km = text.match(/SEO_KEYWORDS:\s*(.+)/);
+  if (km) keywords = km[1].split(',').map(k=>k.trim()).filter(Boolean);
+  currentOutput = {headline, body, keywords};
   document.getElementById('outputHeadline').textContent = headline;
   document.getElementById('outputBody').textContent = body;
-
-  // Stats
   const words = body.split(/\s+/).filter(Boolean).length;
-  const readMin = Math.ceil(words / 200);
   document.getElementById('wordCount').textContent = words.toLocaleString();
-  document.getElementById('readTime').textContent = readMin + ' min';
+  document.getElementById('readTime').textContent  = Math.ceil(words/200)+' min';
   document.getElementById('charCount').textContent = body.length.toLocaleString();
   document.getElementById('articleStats').style.display = 'flex';
-
-  // SEO strip
-  if (keywords.length > 0) {
+  if (keywords.length) {
     const strip = document.getElementById('seoStrip');
     strip.innerHTML = '<span class="seo-tag-label">SEO Keywords Woven In</span>';
-    keywords.forEach(kw => {
-      const tag = document.createElement('span');
-      tag.className = 'seo-tag';
-      tag.textContent = kw.trim();
-      strip.appendChild(tag);
-    });
+    keywords.forEach(kw => { const t=document.createElement('span'); t.className='seo-tag'; t.textContent=kw; strip.appendChild(t); });
     strip.classList.add('visible');
   }
 }
 
-function parseOutput(text) {
-  let headline = '';
-  let body = text;
-
-  const hlMatch = text.match(/^HEADLINE:\s*(.+)/m);
-  if (hlMatch) {
-    headline = hlMatch[1].trim();
-    body = text.slice(text.indexOf(hlMatch[0]) + hlMatch[0].length).trim();
-  }
-
-  // Remove SEO_KEYWORDS line from body during streaming
-  body = body.replace(/\nSEO_KEYWORDS:.*$/s, '').trim();
-  return { headline, body };
+function showArticleOutput(h,b) {
+  document.getElementById('placeholderState').style.display='none';
+  document.getElementById('articleOutput').classList.add('visible');
+  document.getElementById('outputHeadline').textContent=h;
+  document.getElementById('outputBody').textContent=b;
 }
 
-function parseOutputFull(text) {
-  const { headline, body: rawBody } = parseOutput(text);
-
-  // Extract keywords
-  let keywords = [];
-  const kwMatch = text.match(/SEO_KEYWORDS:\s*(.+)/);
-  if (kwMatch) {
-    keywords = kwMatch[1].split(',').map(k => k.trim()).filter(Boolean);
-  }
-
-  const body = rawBody.replace(/\nSEO_KEYWORDS:.*$/s, '').trim();
-  return { headline, body, keywords };
-}
-
-function showArticleOutput(headline, body) {
-  document.getElementById('placeholderState').style.display = 'none';
-  const out = document.getElementById('articleOutput');
-  out.classList.add('visible');
-  document.getElementById('outputHeadline').textContent = headline;
-  document.getElementById('outputBody').textContent = body;
-}
-
-function clearOutput(resetState = true) {
-  if (resetState) {
-    currentOutput = { headline: '', body: '', keywords: [] };
-    document.getElementById('rewriteError').classList.remove('visible');
-  }
-  document.getElementById('placeholderState').style.display = 'flex';
+function clearOutput(reset=true) {
+  if (reset) { currentOutput={headline:'',body:'',keywords:[]}; document.getElementById('rewriteError').classList.remove('visible'); }
+  document.getElementById('placeholderState').style.display='flex';
   document.getElementById('articleOutput').classList.remove('visible');
-  document.getElementById('articleStats').style.display = 'none';
-  const strip = document.getElementById('seoStrip');
-  strip.classList.remove('visible');
-  strip.innerHTML = '<span class="seo-tag-label">SEO Keywords Woven In</span>';
+  document.getElementById('articleStats').style.display='none';
+  const s=document.getElementById('seoStrip'); s.classList.remove('visible'); s.innerHTML='<span class="seo-tag-label">SEO Keywords Woven In</span>';
 }
 
-function setRewriteLoading(loading) {
-  const btn = document.getElementById('rewriteBtn');
-  const bar = document.getElementById('progressBar');
-  btn.disabled = loading;
-  btn.querySelector('.btn-inner').innerHTML = loading
-    ? '<span>⏳</span><span>Rewriting…</span>'
-    : '<span>✦</span><span>Rewrite Article</span>';
-  bar.classList.toggle('active', loading);
+function setRewriteLoading(on) {
+  document.getElementById('rewriteBtn').disabled=on;
+  document.getElementById('rewriteBtn').querySelector('.btn-inner').innerHTML=on?'<span>⏳</span><span>Rewriting…</span>':'<span>✦</span><span>Rewrite Article</span>';
+  document.getElementById('progressBar').classList.toggle('active',on);
 }
 
 function showRewriteError(msg) {
-  const el = document.getElementById('rewriteError');
-  el.textContent = '⚠ ' + msg;
-  el.classList.add('visible');
+  const el=document.getElementById('rewriteError'); el.textContent='⚠ '+msg; el.classList.add('visible');
 }
 
-// ── OUTPUT ACTIONS ─────────────────────────────────────────
 function copyOutput() {
-  const text = (currentOutput.headline ? currentOutput.headline + '\n\n' : '') + currentOutput.body;
-  if (!text.trim()) return;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.classList.add('copied');
-    btn.innerHTML = '<span>✓</span> Copied!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = '<span>⎘</span> Copy';
-    }, 2000);
+  const t=(currentOutput.headline?currentOutput.headline+'\n\n':'')+currentOutput.body;
+  if(!t.trim()) return;
+  navigator.clipboard.writeText(t).then(()=>{
+    const b=document.getElementById('copyBtn'); b.classList.add('copied'); b.innerHTML='<span>✓</span> Copied!';
+    setTimeout(()=>{b.classList.remove('copied');b.innerHTML='<span>⎘</span> Copy';},2000);
   });
 }
 
 function downloadTxt() {
   if (!currentOutput.body) return;
-  const text = (currentOutput.headline ? currentOutput.headline + '\n\n' : '') + currentOutput.body;
-  download('rewritten-article.txt', 'text/plain', text);
+  dl('rewritten-article.txt','text/plain',(currentOutput.headline?currentOutput.headline+'\n\n':'')+currentOutput.body);
 }
 
 function downloadHtml() {
   if (!currentOutput.body) return;
-  const paragraphs = currentOutput.body
-    .split('\n\n').filter(Boolean)
-    .map(p => `<p>${escapeHtml(p)}</p>`).join('\n');
-  const html = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8">
-<title>${escapeHtml(currentOutput.headline || 'Rewritten Article')}</title>
-<style>body{font-family:Georgia,serif;max-width:780px;margin:40px auto;padding:0 20px;line-height:1.8;color:#111}
-h1{font-size:2em;line-height:1.2;margin-bottom:24px}p{margin:0 0 1.2em}</style>
-</head><body>
-<h1>${escapeHtml(currentOutput.headline || '')}</h1>
-${paragraphs}
-</body></html>`;
-  download('rewritten-article.html', 'text/html', html);
+  const ps = currentOutput.body.split('\n\n').filter(Boolean).map(p=>`<p>${escHtml(p)}</p>`).join('\n');
+  dl('rewritten-article.html','text/html',`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${escHtml(currentOutput.headline||'Article')}</title><style>body{font-family:Georgia,serif;max-width:780px;margin:40px auto;padding:0 20px;line-height:1.8;color:#111}h1{font-size:2em;line-height:1.2;margin-bottom:24px}p{margin:0 0 1.2em}</style></head><body><h1>${escHtml(currentOutput.headline||'')}</h1>${ps}</body></html>`);
 }
 
-function download(filename, type, content) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], { type }));
-  a.download = filename;
-  a.click();
+function dl(name,type,content) {
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click();
 }
 
-function escapeHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 </body>
 </html>
