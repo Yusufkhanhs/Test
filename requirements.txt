@@ -1,0 +1,3 @@
+streamlit
+trafilatura
+google-generativeai
