@@ -2,17 +2,17 @@ import streamlit as st
 from trafilatura import fetch_url, extract
 import google.generativeai as genai
 
-# Basic Page Config
+# Basic Page Setup
 st.set_page_config(page_title="Kannada News Rewriter", layout="centered")
 
 st.title("🗞️ Kannada Journalistic Rewriter")
 
-# Sidebar
+# Sidebar Configuration
 with st.sidebar:
     st.header("Setup")
     api_key = st.text_input("Enter Gemini API Key", type="password")
 
-# Main Logic
+# Main Application Logic
 if api_key:
     try:
         genai.configure(api_key=api_key)
@@ -32,23 +32,27 @@ if api_key:
                 article_text = content_input
 
             if article_text:
-                # This prompt ensures journalistic style and transformative rewrite
+                # This prompt ensures journalistic style and copyright safety
                 prompt = f"""
-                Rewrite this as a professional Kannada news journalist.
-                1. Use a formal Kannada headline.
-                2. Structure as a news report (most important facts first).
+                Act as a professional Kannada journalist. 
+                Rewrite the following article in formal Kannada (Granthika style).
+                1. Create a compelling news headline.
+                2. Structure it as a news report (Inverted Pyramid style).
                 3. Completely rephrase the content to ensure it is a new, original work in Kannada.
-                Content to rewrite: {article_text}
+                
+                Content to rewrite:
+                {article_text}
                 """
                 
-                with st.spinner("Rewriting..."):
+                with st.spinner("Writing..."):
                     response = model.generate_content(prompt)
-                    st.markdown("### Result")
+                    st.markdown("---")
+                    st.markdown("### ಪರಿಷ್ಕೃತ ಸುದ್ದಿ (Generated Article)")
                     st.write(response.text)
             else:
-                st.warning("Please provide a URL or text.")
+                st.warning("Please provide a URL or text content.")
                 
     except Exception as e:
         st.error(f"An error occurred: {e}")
 else:
-    st.info("Please enter your API Key in the sidebar.")
+    st.info("👋 Please enter your API Key in the sidebar to start.")
