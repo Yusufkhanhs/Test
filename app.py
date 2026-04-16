@@ -1,58 +1,43 @@
 import streamlit as st
-from trafilatura import fetch_url, extract
 import google.generativeai as genai
+from trafilatura import fetch_url, extract
 
-# Basic Page Setup
-st.set_page_config(page_title="Kannada News Rewriter", layout="centered")
-
+st.set_page_config(page_title="Kannada News Rewriter")
 st.title("🗞️ Kannada Journalistic Rewriter")
 
-# Sidebar Configuration
+# Sidebar
 with st.sidebar:
     st.header("Setup")
     api_key = st.text_input("Enter Gemini API Key", type="password")
 
-# Main Application Logic
 if api_key:
-    try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
-        url = st.text_input("Paste English Article URL:")
-        content_input = st.text_area("OR Paste English text:")
+    url = st.text_input("Article URL:")
+    text_input = st.text_area("Or Paste English Text:")
 
-        if st.button("Rewrite in Kannada"):
-            article_text = ""
+    if st.button("Rewrite in Kannada"):
+        content = ""
+        if url:
+            with st.spinner("Extracting..."):
+                downloaded = fetch_url(url)
+                content = extract(downloaded)
+        else:
+            content = text_input
+
+        if content:
+            # This prompt ensures the rewrite is 'Transformative' for copyright safety
+            prompt = f"Rewrite this English news as a professional Kannada journalist. Use formal Kannada: {content}"
             
-            if url:
-                with st.spinner("Extracting..."):
-                    downloaded = fetch_url(url)
-                    article_text = extract(downloaded)
-            else:
-                article_text = content_input
-
-            if article_text:
-                # This prompt ensures journalistic style and copyright safety
-                prompt = f"""
-                Act as a professional Kannada journalist. 
-                Rewrite the following article in formal Kannada (Granthika style).
-                1. Create a compelling news headline.
-                2. Structure it as a news report (Inverted Pyramid style).
-                3. Completely rephrase the content to ensure it is a new, original work in Kannada.
-                
-                Content to rewrite:
-                {article_text}
-                """
-                
-                with st.spinner("Writing..."):
+            with st.spinner("Writing..."):
+                try:
                     response = model.generate_content(prompt)
-                    st.markdown("---")
-                    st.markdown("### ಪರಿಷ್ಕೃತ ಸುದ್ದಿ (Generated Article)")
+                    st.markdown("### Result")
                     st.write(response.text)
-            else:
-                st.warning("Please provide a URL or text content.")
-                
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+                except Exception as e:
+                    st.error(f"AI Error: {e}")
+        else:
+            st.warning("Please provide content.")
 else:
-    st.info("👋 Please enter your API Key in the sidebar to start.")
+    st.info("Please enter your API Key in the sidebar.")
